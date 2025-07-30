@@ -27,6 +27,7 @@ jobs:
 
       - name: Run Python workload
         run: |
+          python nptg.py
           python naptan.py
 
       - name: Deploy to gh-pages
