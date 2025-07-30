@@ -31,6 +31,7 @@ def getNptg():
 			fetchNptgData()
 
 		else:
+			os.makedirs(data_dir, exist_ok=True)
 			with open(os.path.join(data_dir, f'nptg.xml'), 'wb') as f:
 				f.write(_data.content)
 
