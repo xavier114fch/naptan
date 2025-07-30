@@ -28,7 +28,7 @@ def getNptg():
 		except Exception as err:
 			print(f'Cannot fetch NPTG data. Retrying after 10 sec ...')
 			time.sleep(10)
-			fetchNptgData(atco)
+			fetchNptgData()
 
 		else:
 			with open(os.path.join(data_dir, f'nptg.xml'), 'wb') as f:
