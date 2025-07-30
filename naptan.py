@@ -605,6 +605,7 @@ def main():
 	for _atco in _atco_list:
 		getNaptan(_atco)
 
+	os.makedirs(data_dir, exist_ok=True)
 	print('Creating aggregate JSON for StopPoints ...')
 	with open(os.path.join(data_dir, f'naptan_stop_points_all.json'), 'w') as f:
 		f.write(json.dumps(_stops_all, ensure_ascii = False, separators=(',', ':')))
