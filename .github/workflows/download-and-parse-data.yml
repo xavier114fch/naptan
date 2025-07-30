@@ -28,7 +28,7 @@ jobs:
       - name: Run Python workload
         run: |
           python nptg.py
-          python naptan.py
+          # python naptan.py
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
