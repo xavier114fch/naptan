@@ -1,4 +1,4 @@
-name: Download and Parse Data
+name: Naptan Download and Parse Data
 
 on:
   schedule:
