@@ -28,8 +28,8 @@ jobs:
       - name: Fetch Naptan
         run: |
           python naptan.py
-          find data/naptan -maxdepth 1 -type f -regex './naptan_[0-9]\+\.json' -delete
-          find data/naptan -maxdepth 1 -type f -regex './naptan_[0-9]\+\.xml' -delete
+          find data/naptan -maxdepth 1 -type f -regex './naptan_[0-9]\{3\}\.json' -delete
+          find data/naptan -maxdepth 1 -type f -regex './naptan_[0-9]\{3\}\.xml' -delete
 
       - name: Deploy to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
