@@ -607,29 +607,29 @@ def main():
 		getNaptan(_atco)
 
 	os.makedirs(data_dir, exist_ok=True)
-	print('Creating aggregate JSON for StopPoints ...')
-	with open(os.path.join(data_dir, f'naptan_stop_points_all.json'), 'w') as f:
-		f.write(json.dumps(_stops_all, ensure_ascii = False, separators=(',', ':')))
-		_len = len(_stops_all)
-		print(f'Inserted {_len} stop points.')
+	# print('Creating aggregate JSON for StopPoints ...')
+	# with open(os.path.join(data_dir, f'naptan_stop_points_all.json'), 'w') as f:
+	# 	f.write(json.dumps(_stops_all, ensure_ascii = False, separators=(',', ':')))
+	# 	_len = len(_stops_all)
+	# 	print(f'Inserted {_len} stop points.')
 
-	print('Creating aggregate JSON for StopAreas ...')
-	with open(os.path.join(data_dir, f'naptan_stop_areas_all.json'), 'w') as f:
-		f.write(json.dumps(_stop_areas_all, ensure_ascii = False, separators=(',', ':')))
-		_len = len(_stop_areas_all)
-		print(f'Inserted {_len} stop areas.')
+	# print('Creating aggregate JSON for StopAreas ...')
+	# with open(os.path.join(data_dir, f'naptan_stop_areas_all.json'), 'w') as f:
+	# 	f.write(json.dumps(_stop_areas_all, ensure_ascii = False, separators=(',', ':')))
+	# 	_len = len(_stop_areas_all)
+	# 	print(f'Inserted {_len} stop areas.')
 
-	print('Creating aggregate GeoJSON for StopPoints ...')
-	with open(os.path.join(data_dir, f'naptan_stop_points_all.geojson'), 'w') as f:
-		f.write(json.dumps(_geodata_stops_all, ensure_ascii = False, separators=(',', ':')))
-		_len = len(_geodata_stops_all['features'])
-		print(f'Inserted {_len} stop points in geo.')
+	# print('Creating aggregate GeoJSON for StopPoints ...')
+	# with open(os.path.join(data_dir, f'naptan_stop_points_all.geojson'), 'w') as f:
+	# 	f.write(json.dumps(_geodata_stops_all, ensure_ascii = False, separators=(',', ':')))
+	# 	_len = len(_geodata_stops_all['features'])
+	# 	print(f'Inserted {_len} stop points in geo.')
 
-	print('Creating aggregate GeoJSON for StopAreas ...')
-	with open(os.path.join(data_dir, f'naptan_stop_areas_all.geojson'), 'w') as f:
-		f.write(json.dumps(_geodata_areas_all, ensure_ascii = False, separators=(',', ':')))
-		_len = len(_geodata_areas_all['features'])
-		print(f'Inserted {_len} stop areas in geo.')
+	# print('Creating aggregate GeoJSON for StopAreas ...')
+	# with open(os.path.join(data_dir, f'naptan_stop_areas_all.geojson'), 'w') as f:
+	# 	f.write(json.dumps(_geodata_areas_all, ensure_ascii = False, separators=(',', ':')))
+	# 	_len = len(_geodata_areas_all['features'])
+	# 	print(f'Inserted {_len} stop areas in geo.')
 
 	print('Splitting StopPoints ...')
 	for _k, _v in _stops_all.items():
