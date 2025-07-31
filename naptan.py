@@ -47,7 +47,7 @@ def getAtcoList():
 		getAtcoList()
 
 	else:
-		_data = json.load(_data)
+		_data = _data.json()
 		return sorted(_data.keys())
 
 def getNaptan(atco):
