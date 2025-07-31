@@ -20,6 +20,7 @@ def fetchTndsData(_data_dir):
 	# Connect to the FTP server
 	_ftp = FTP(_ftp_host)
 	_ftp.login(_ftp_username, _ftp_password)
+	_ftp.set_pasv(True) # Enable passive mode
 
 	# Navigate to the desired directory
 	_ftp.cwd('/TNDSV2.5')
