@@ -27,6 +27,7 @@ jobs:
 
       - name: Fetch NPTG
         run: |
+          mkdir data/nptg
           python nptg.py
           rm -f data/nptg/nptg.xml data/nptg/nptg.json
 
