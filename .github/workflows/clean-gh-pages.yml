@@ -13,11 +13,12 @@ jobs:
         with:
           ref: gh-pages
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Remove all files
         run: |
           git rm -rf .
-          rm -rf ./* .[^.]* || true  # Remove everything including hidden files
+          # rm -rf ./* .[^.]* || true  # Remove everything including hidden files
           
           touch README.md
           git add README.md
