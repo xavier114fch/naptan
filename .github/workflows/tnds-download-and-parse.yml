@@ -1,0 +1,46 @@
+name: TNDS Download and Parse Data
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Fetch TNDS
+        env:
+          TNDS_FTP_USER: ${{ secrets.TNDS_FTP_USER }}
+          TNDS_FTP_PWD: ${{ secrets.TNDS_FTP_PWD }}
+        run: |
+          python tnds.py
+          find data/tnds -maxdepth 1 -type f -name '*.zip -delete
+          find data/tnds -maxdepth 1 -type f -name 'servicereport.csv' -delete
+          find data/tnds -maxdepth 1 -type f -name 'log.txt' -delete
+          find data/tnds -maxdepth 2 -type f -name '_*.json' -delete
+
+      - name: Deploy to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+            target-folder: data/
+            folder: data
+            commit-message: "Update resources from ${{ github.run_number }}:${{ github.run_attempt }}"
+            branch: gh-pages
+            clean: false
