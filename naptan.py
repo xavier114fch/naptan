@@ -635,6 +635,7 @@ def main():
 		_d = {}
 		_d[_k] = _v
 
+		os.makedirs(f'{data_dir}/stopPoints', exist_ok=True)
 		with open(os.path.join(f'{data_dir}/stopPoints', f'{_k}.json'), 'w') as f:
 			f.write(json.dumps(_d, ensure_ascii = False, separators=(',', ':')))
 
@@ -643,6 +644,7 @@ def main():
 		_d = {}
 		_d[_k] = _v
 
+		os.makedirs(f'{data_dir}/stopAreas', exist_ok=True)
 		with open(os.path.join(f'{data_dir}/stopAreas', f'{_k}.json'), 'w') as f:
 			f.write(json.dumps(_d, ensure_ascii = False, separators=(',', ':')))
 
