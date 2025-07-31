@@ -30,13 +30,15 @@ jobs:
           python nptg.py
           rm -f data/nptg/nptg.xml data/nptg/nptg.json
 
-      - name: Deploy to gh-pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./data  # Make sure your script puts finalised files here
-          destination_dir: data
-          exclude_assets: '.nojekyll'
-          commit_message: ${{ github.event.head_commit.message }}
-          # force_orphan: true  # This avoids history clutter
+      - name: Deploy to gh-pages under /data/nptg
+        run: |
+          git config --global user.name "Xavier Fung"
+          git config --global user.email "1157303+xavier114fch@users.noreply.github.com"
+
+          git clone --branch gh-pages https://github.com/${{ github.repository }} gh-pages
+          cp -r data/nptg gh-pages/data/
+
+          cd gh-pages
+          git add data/nptg
+          git commit -m "Update NPTG data" || echo "No changes to commit"
+          git push origin gh-pages
