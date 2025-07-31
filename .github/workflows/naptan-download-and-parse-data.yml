@@ -38,4 +38,4 @@ jobs:
           destination_dir: data
           exclude_assets: '.nojekyll'
           commit_message: ${{ github.event.head_commit.message }}
-          force_orphan: true  # This avoids history clutter
+          # force_orphan: true  # This avoids history clutter
