@@ -66,8 +66,8 @@ def getNaptan(atco):
 
 		else:
 			os.makedirs(data_dir, exist_ok=True)
-			with open(os.path.join(data_dir, f'naptan_{atco}.xml'), 'wb') as f:
-				f.write(_data.content)
+			# with open(os.path.join(data_dir, f'naptan_{atco}.xml'), 'wb') as f:
+			# 	f.write(_data.content)
 
 			return _data.content
 
@@ -133,8 +133,8 @@ def getNaptan(atco):
 			_data = re.sub(_pattern, r'"\1"', _data)
 			_data = _data.replace('@', '')
 
-			with open(os.path.join(data_dir, f'naptan_{atco}.json'), 'w') as f:
-				f.write(_data)
+			# with open(os.path.join(data_dir, f'naptan_{atco}.json'), 'w') as f:
+			# 	f.write(_data)
 
 			print('Creating GeoJSON for StopPoints ...')
 			_data = json.loads(_data)
@@ -492,15 +492,15 @@ def getNaptan(atco):
 			for _stop_point in _stop_points:
 				appendStopPoint(_stop_point)
 
-			with open(os.path.join(data_dir, f'naptan_stop_points_{atco}.json'), 'w') as f:
-				f.write(json.dumps(_new_data, ensure_ascii = False, separators=(',', ':')))
-				_len = len(_new_data)
-				print(f'Inserted {_len} stop points.')
+			# with open(os.path.join(data_dir, f'naptan_stop_points_{atco}.json'), 'w') as f:
+			# 	f.write(json.dumps(_new_data, ensure_ascii = False, separators=(',', ':')))
+			# 	_len = len(_new_data)
+			# 	print(f'Inserted {_len} stop points.')
 
-			with open(os.path.join(data_dir, f'naptan_stop_points_{atco}.geojson'), 'w') as f:
-				f.write(json.dumps(_geodata, ensure_ascii = False, separators=(',', ':')))
-				_len = len(_geodata['features'])
-				print(f'Inserted {_len} stop points in geo.')
+			# with open(os.path.join(data_dir, f'naptan_stop_points_{atco}.geojson'), 'w') as f:
+			# 	f.write(json.dumps(_geodata, ensure_ascii = False, separators=(',', ':')))
+			# 	_len = len(_geodata['features'])
+			# 	print(f'Inserted {_len} stop points in geo.')
 
 			print('Creating GeoJSON for StopAreas ...')
 			_new_data = {}
@@ -587,15 +587,15 @@ def getNaptan(atco):
 			for _stop_area in _stop_areas:
 				appendStopArea(_stop_area)
 
-			with open(os.path.join(data_dir, f'naptan_stop_areas_{atco}.json'), 'w') as f:
-				f.write(json.dumps(_new_data, ensure_ascii = False, separators=(',', ':')))
-				_len = len(_new_data)
-				print(f'Inserted {_len} stop areas.')
+			# with open(os.path.join(data_dir, f'naptan_stop_areas_{atco}.json'), 'w') as f:
+			# 	f.write(json.dumps(_new_data, ensure_ascii = False, separators=(',', ':')))
+			# 	_len = len(_new_data)
+			# 	print(f'Inserted {_len} stop areas.')
 
-			with open(os.path.join(data_dir, f'naptan_stop_areas_{atco}.geojson'), 'w') as f:
-				f.write(json.dumps(_geodata, ensure_ascii = False, separators=(',', ':')))
-				_len = len(_geodata['features'])
-				print(f'Inserted {_len} stop areas in geo.')
+			# with open(os.path.join(data_dir, f'naptan_stop_areas_{atco}.geojson'), 'w') as f:
+			# 	f.write(json.dumps(_geodata, ensure_ascii = False, separators=(',', ':')))
+			# 	_len = len(_geodata['features'])
+			# 	print(f'Inserted {_len} stop areas in geo.')
 
 		print('===')
 
@@ -636,22 +636,28 @@ def main():
 	# 	print(f'Inserted {_len} stop areas in geo.')
 
 	print('Splitting StopPoints ...')
+	os.makedirs(f'{data_dir}/stopPoints', exist_ok=True)
 	for _k, _v in _stops_all.items():
 		_d = {}
 		_d[_k] = _v
 
-		os.makedirs(f'{data_dir}/stopPoints', exist_ok=True)
 		with open(os.path.join(f'{data_dir}/stopPoints', f'{_k}.json'), 'w') as f:
 			f.write(json.dumps(_d, ensure_ascii = False, separators=(',', ':')))
 
+	with open(os.path.join(f'{data_dir}', f'naptan_stop_points_all.json'), 'w') as f:
+			f.write(json.dumps([_k for _k in _stops_all], ensure_ascii = False, separators=(',', ':')))
+
 	print('Splitting StopAreas ...')
+	os.makedirs(f'{data_dir}/stopAreas', exist_ok=True)
 	for _k, _v in _stop_areas_all.items():
 		_d = {}
 		_d[_k] = _v
 
-		os.makedirs(f'{data_dir}/stopAreas', exist_ok=True)
 		with open(os.path.join(f'{data_dir}/stopAreas', f'{_k}.json'), 'w') as f:
 			f.write(json.dumps(_d, ensure_ascii = False, separators=(',', ':')))
+
+	with open(os.path.join(f'{data_dir}', f'naptan_stop_areas_all.json'), 'w') as f:
+			f.write(json.dumps([_k for _k in _stop_areas_all], ensure_ascii = False, separators=(',', ':')))
 
 if __name__ == "__main__":
 	main()
