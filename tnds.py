@@ -37,6 +37,7 @@ def fetchTndsData(_data_dir):
 
 		if _local_timestamp is None or _remote_timestamp > _local_timestamp:
 			print(f'Getting {_file_name} from TNDS FTP ...')
+			os.makedirs(_local_file_path, exist_ok=True)
 			with open(_local_file_path, 'wb') as _local_file:
 				 _ftp.retrbinary(f'RETR {_file_name}', _local_file.write)
 
