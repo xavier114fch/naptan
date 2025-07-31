@@ -30,7 +30,7 @@ jobs:
           python nptg.py
           rm -f data/nptg/nptg.xml data/nptg/nptg.json
 
-      - name: Deploy to gh-pages under /data/nptg
+      - name: Deploy to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
             target-folder: data/

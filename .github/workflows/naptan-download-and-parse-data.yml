@@ -27,20 +27,15 @@ jobs:
 
       - name: Fetch Naptan
         run: |
-          mkdir -p data/naptan
           python naptan.py
           find data/naptan -maxdepth 1 -type f -regex './naptan_[0-9]\+\.json' -delete
           find data/naptan -maxdepth 1 -type f -regex './naptan_[0-9]\+\.xml' -delete
 
-      - name: Deploy to gh-pages under /data/naptan
-        run: |
-          git config --global user.name "Xavier Fung"
-          git config --global user.email "1157303+xavier114fch@users.noreply.github.com"
-
-          git clone --branch gh-pages https://github.com/${{ github.repository }} gh-pages
-          cp -r data/naptan gh-pages/data/
-
-          cd gh-pages
-          git add data/naptan
-          git commit -m "Update Naptan data" || echo "No changes to commit"
-          git push origin gh-pages
+      - name: Deploy to gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+            target-folder: data/
+            folder: data
+            commit-message: "Update resources from ${{ github.run_number }}:${{ github.run_attempt }}"
+            branch: gh-pages
+            clean: false
