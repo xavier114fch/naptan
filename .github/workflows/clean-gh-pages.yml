@@ -1,0 +1,28 @@
+name: Clear gh-pages Branch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  clear-gh-pages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone gh-pages branch
+        run: |
+          git config --global user.name "Xavier Fung"
+          git config --global user.email "1157303+xavier114fch@users.noreply.github.com"
+          
+          git clone --branch gh-pages https://github.com/${{ github.repository }} gh-pages
+          cd gh-pages
+
+          # Remove all tracked and untracked files
+          git rm -rf .
+          rm -rf ./* .[^.] .??*
+
+          # Optionally add .nojekyll or README to keep it non-empty
+          touch README.md
+          git add README.md
+
+          git commit -m "Clear all contents from gh-pages" || echo "Nothing to commit"
+          git push origin gh-pages --force
