@@ -175,7 +175,8 @@ def getNaptan(atco):
 				_locality_name = ''
 
 				if _locality_ref in _locality_list:
-					_locality_name = _locality_list[_locality_ref].get('Descriptor', {}).get('LocalityName', '')
+					# _locality_name = _locality_list[_locality_ref].get('Descriptor', {}).get('LocalityName', '')
+					_locality_name = _locality_list[_locality_ref].get('name', {})
 
 				_town = point.get('Place', {}).get('Town', '')
 				_suburb = point.get('Place', {}).get('Suburb', '')
