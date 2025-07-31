@@ -105,8 +105,10 @@ def getNaptan(atco):
 	def openNptgLocalities():
 		global _locality_list
 		try:
-			with open(os.path.join(f'{nptg_dir}','nptg_localities.json'), 'r') as f:
-				_locality_list = json.load(f)
+			_response = retryRequest('https://raw.githubusercontent.com/xavier114fch/naptan/refs/heads/gh-pages/data/nptg/nptg_localities.json')
+			_locality_list = _response.json()
+			# with open(os.path.join(f'{nptg_dir}','nptg_localities.json'), 'r') as f:
+			# 	_locality_list = json.load(f)
 
 		except BaseException:
 			print('Cannot open NPTG locality list.')
