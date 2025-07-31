@@ -28,10 +28,7 @@ jobs:
       - name: Fetch NPTG
         run: |
           python nptg.py
-
-      - name: Fetch Naptan
-        run: |
-          python naptan.py
+          rm -f nptg.xml
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
