@@ -27,7 +27,7 @@ jobs:
 
       - name: Fetch Naptan
         run: |
-          mkdir data/naptan
+          mkdir -p data/naptan
           python naptan.py
           find data/naptan -maxdepth 1 -type f -regex './naptan_[0-9]\+\.json' -delete
           find data/naptan -maxdepth 1 -type f -regex './naptan_[0-9]\+\.xml' -delete
