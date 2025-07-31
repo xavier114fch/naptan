@@ -27,19 +27,14 @@ jobs:
 
       - name: Fetch NPTG
         run: |
-          mkdir -p data/nptg
           python nptg.py
           rm -f data/nptg/nptg.xml data/nptg/nptg.json
 
       - name: Deploy to gh-pages under /data/nptg
-        run: |
-          git config --global user.name "Xavier Fung"
-          git config --global user.email "1157303+xavier114fch@users.noreply.github.com"
-
-          git clone --branch gh-pages https://github.com/${{ github.repository }} gh-pages
-          cp -r data/nptg gh-pages/data/
-
-          cd gh-pages
-          git add data/nptg
-          git commit -m "Update NPTG data" || echo "No changes to commit"
-          git push origin gh-pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+            target-folder: data/
+            folder: data
+            commit-message: "Update resources from ${{ github.run_number }}:${{ github.run_attempt }}"
+            branch: gh-pages
+            clean: false
