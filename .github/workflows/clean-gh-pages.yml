@@ -8,21 +8,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clone gh-pages branch
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Remove all files
         run: |
-          git config --global user.name "Xavier Fung"
-          git config --global user.email "1157303+xavier114fch@users.noreply.github.com"
-          
-          git clone --branch gh-pages https://github.com/${{ github.repository }} gh-pages
-          cd gh-pages
-
-          # Remove all tracked and untracked files
           git rm -rf .
-          rm -rf ./* .[^.] .??*
-
-          # Optionally add .nojekyll or README to keep it non-empty
+          rm -rf ./* .[^.]* || true  # Remove everything including hidden files
+          
           touch README.md
           git add README.md
 
-          git commit -m "Clear all contents from gh-pages" || echo "Nothing to commit"
+          git config --global user.name "Xavier Fung"
+          git config --global user.email "1157303+xavier114fch@users.noreply.github.com"
+          git commit -m "Clear gh-pages branch [skip ci]" || echo "Nothing to commit"
+
+      - name: Push changes
+        run: |
           git push origin gh-pages --force
