@@ -25,10 +25,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Python workload
+      - name: Fetch NPTG
         run: |
           python nptg.py
-          # python naptan.py
+
+      - name: Fetch Naptan
+        run: |
+          python naptan.py
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
