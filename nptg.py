@@ -143,13 +143,13 @@ def getNptg():
 
 			_revised_data[_v['parent']]['children'].append(_k)
 
-	with open(os.path.join(data_dir, f'nptg_localities.json'), 'w') as f:
-		f.write(json.dumps(_new_data, ensure_ascii = False, separators=(',', ':')))
+	# with open(os.path.join(data_dir, f'nptg_localities.json'), 'w') as f:
+	# 	f.write(json.dumps(_new_data, ensure_ascii = False, separators=(',', ':')))
 
 	with open(os.path.join(data_dir, f'nptg_localities.geojson'), 'w') as f:
 		f.write(json.dumps(_geodata, ensure_ascii = False, separators=(',', ':')))
 
-	with open(os.path.join(data_dir, f'nptg_localities_revised.json'), 'w') as f:
+	with open(os.path.join(data_dir, f'nptg_localities.json'), 'w') as f:
 		f.write(json.dumps(_revised_data, ensure_ascii = False, separators=(',', ':')))
 
 	for _k, _v in _revised_data.items():
@@ -205,13 +205,13 @@ def getNptg():
 	for _point in _data.get('NationalPublicTransportGazetteer', {}).get('PlusbusZones', {}).get('PlusbusZone', []):
 		appendPlusbusZones(_point)
 
-	with open(os.path.join(data_dir, f'nptg_plusbuszones.json'), 'w') as f:
-		f.write(json.dumps(_new_data, ensure_ascii = False, separators=(',', ':')))
+	# with open(os.path.join(data_dir, f'nptg_plusbuszones.json'), 'w') as f:
+	# 	f.write(json.dumps(_new_data, ensure_ascii = False, separators=(',', ':')))
 
 	with open(os.path.join(data_dir, f'nptg_plusbuszones.geojson'), 'w') as f:
 		f.write(json.dumps(_geodata, ensure_ascii = False, separators=(',', ':')))
 
-	with open(os.path.join(data_dir, f'nptg_plusbuszones_revised.json'), 'w') as f:
+	with open(os.path.join(data_dir, f'nptg_plusbuszones.json'), 'w') as f:
 		f.write(json.dumps(_revised_data, ensure_ascii = False, separators=(',', ':')))
 
 	for _k, _v in _revised_data.items():
