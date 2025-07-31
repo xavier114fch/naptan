@@ -37,8 +37,9 @@ def retryRequest(url):
 
 def getAtcoList():
 	try:
-		with open(os.path.join(nptg_dir, 'nptg_atcoareas.json'), 'r') as f:
-			_data = json.load(f)
+		_data = retryRequest('https://raw.githubusercontent.com/xavier114fch/naptan/refs/heads/gh-pages/data/nptg/nptg_atcoareas.json')
+		# with open(os.path.join(nptg_dir, 'nptg_atcoareas.json'), 'r') as f:
+		# 	_data = json.load(f)
 
 	except Exception as err:
 		print('Cannot fetch NPTG data to obtain ATCO list. Retrying ...')
@@ -46,6 +47,7 @@ def getAtcoList():
 		getAtcoList()
 
 	else:
+		_data = json.load(_data)
 		return sorted(_data.keys())
 
 def getNaptan(atco):
