@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Maximize build space
+      - name: Maximise build space
         uses: easimon/maximize-build-space@master
         with:
           root-reserve-mb: 512
@@ -51,11 +51,14 @@ jobs:
           find data/tnds -maxdepth 2 -type f -name '*.xml' -delete
           find data/tnds -maxdepth 2 -type f -name '_*.json' -delete
 
+      - name: Set commit message with timestamp
+          run: echo "COMMIT_MSG=Update TNDS at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
+
       - name: Deploy to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
             target-folder: data/
             folder: data
-            commit-message: "Update TNDS at $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            commit-message: ${{ env.COMMIT_MSG }}
             branch: gh-pages
             clean: false

@@ -34,11 +34,14 @@ jobs:
           find data/naptan -maxdepth 1 -type f -regex './naptan_[0-9]\{3\}\.json' -delete
           find data/naptan -maxdepth 1 -type f -regex './naptan_[0-9]\{3\}\.xml' -delete
 
+      - name: Set commit message with timestamp
+          run: echo "COMMIT_MSG=Update Naptan at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
+
       - name: Deploy to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
             target-folder: data/
             folder: data
-            commit-message: "Update Naptan at $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            commit-message: ${{ env.COMMIT_MSG }}
             branch: gh-pages
             clean: false
