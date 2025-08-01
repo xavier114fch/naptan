@@ -96,7 +96,7 @@ def fetchTndsData(_data_dir):
 				print(f'Unzipping {_file_name} ...')
 				_zip_file_path = os.path.join(_data_dir, _file_name)
 				extract_zip(_zip_file_path, _data_dir)
-				convertTnds(_data_dir, os.path.splitext(os.path.basename(_file_name))[0])
+				# convertTnds(_data_dir, os.path.splitext(os.path.basename(_file_name))[0])
 
 		else:
 			print(f'{_file_name} is up to date.')
@@ -115,7 +115,7 @@ def extract_zip(zip_file_path, extract_directory):
 		zip_ref.extractall(extract_path)
 
 def convertTnds(_data_dir, _working_dir):
-	# _directories = [_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))]
+	_directories = [_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))]
 
 	if os.path.exists(f'{_data_dir}/tnds_out_of_date.json'):
 		with open(os.path.join(f'{_data_dir}', 'tnds_out_of_date.json'), 'r') as f:
@@ -124,86 +124,85 @@ def convertTnds(_data_dir, _working_dir):
 	else:
 		_out_of_date_file_list = []
 
-	# for _directory in _directories:
-		# print(f'Converting TNDS XML files in {_directory} ...')
+	for _directory in _directories:
+		print(f'Converting TNDS XML files in {_directory} ...')
 
-		# NCSD XMLs are in one level deeper
-		# _dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
+		NCSD XMLs are in one level deeper
+		_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
 
-	_total_count, _out_of_date_count = 0, 0
-	_dir = f'{_data_dir}/{_working_dir}'
+		_total_count, _out_of_date_count = 0, 0
 
-	for _file in sorted(os.listdir(_dir)):
-		if _file.endswith('.xml'):
-			# print(f'Converting TNDS XML file {_dir}/{_file} ...')
-			_total_count = _total_count + 1
+		for _file in sorted(os.listdir(_dir)):
+			if _file.endswith('.xml'):
+				# print(f'Converting TNDS XML file {_dir}/{_file} ...')
+				_total_count = _total_count + 1
 
-			if f'{_dir}/{_file}' in _out_of_date_file_list:
-				_out_of_date_count = _out_of_date_count + 1
-				continue
+				if f'{_dir}/{_file}' in _out_of_date_file_list:
+					_out_of_date_count = _out_of_date_count + 1
+					continue
 
-			with open(os.path.join(_dir, _file), 'r') as f:
-				_content = f.read()
-				_root = ET.fromstring(_content)
-				_ns = {'txc': 'http://www.transxchange.org.uk/'}
-				_services = _root.findall('txc:Services/txc:Service', _ns)
-				_is_out_of_date = 0
+				with open(os.path.join(_dir, _file), 'r') as f:
+					_content = f.read()
+					_root = ET.fromstring(_content)
+					_ns = {'txc': 'http://www.transxchange.org.uk/'}
+					_services = _root.findall('txc:Services/txc:Service', _ns)
+					_is_out_of_date = 0
 
-				# if len(_services) > 1:
-				# 	print(f'{_dir}/{_file} has {len(_services)} services.')
+					# if len(_services) > 1:
+					# 	print(f'{_dir}/{_file} has {len(_services)} services.')
 
-				for _service in _services:
-					_operating_period = _service.find('txc:OperatingPeriod', _ns)
+					for _service in _services:
+						_operating_period = _service.find('txc:OperatingPeriod', _ns)
 
-					if _operating_period is not None:
-						_start_date = _operating_period.findtext('txc:StartDate', default='', namespaces=_ns).strip()
-						_end_date = _operating_period.findtext('txc:EndDate', default='', namespaces=_ns).strip()
+						if _operating_period is not None:
+							_start_date = _operating_period.findtext('txc:StartDate', default='', namespaces=_ns).strip()
+							_end_date = _operating_period.findtext('txc:EndDate', default='', namespaces=_ns).strip()
 
-						if compareDates(_start_date, _end_date):
-							_data = json.dumps(xmltodict.parse(_content), ensure_ascii=False, separators=(',', ':'))
-							_data = _data.replace('@', '')
+							if compareDates(_start_date, _end_date):
+								_data = json.dumps(xmltodict.parse(_content), ensure_ascii=False, separators=(',', ':'))
+								_data = _data.replace('@', '')
 
-							with open(os.path.join(_dir, f'_{os.path.splitext(_file)[0]}.json'), 'w') as f:
-								f.write(_data)
+								with open(os.path.join(_dir, f'_{os.path.splitext(_file)[0]}.json'), 'w') as f:
+									f.write(_data)
 
-							break
+								break
+
+							else:
+								# print(f'Service in {_dir}/{_file} is out of date: {_start_date} ~ {_end_date}.')
+								_is_out_of_date = _is_out_of_date + 1
+								continue
 
 						else:
-							# print(f'Service in {_dir}/{_file} is out of date: {_start_date} ~ {_end_date}.')
-							_is_out_of_date = _is_out_of_date + 1
 							continue
 
-					else:
-						continue
+					if _is_out_of_date == len(_services):
+						# print(f'All services in {_dir}/{_file} are out of date.')
+						_out_of_date_file_list.append(f'{_dir}/{_file}')
+						_out_of_date_count = _out_of_date_count + 1
 
-				if _is_out_of_date == len(_services):
-					# print(f'All services in {_dir}/{_file} are out of date.')
-					_out_of_date_file_list.append(f'{_dir}/{_file}')
-					_out_of_date_count = _out_of_date_count + 1
+					# _operating_period = _root.find('txc:Services/txc:Service/txc:OperatingPeriod', _ns)
 
-				# _operating_period = _root.find('txc:Services/txc:Service/txc:OperatingPeriod', _ns)
+					# if _operating_period is not None:
+					# 	_start_date = _operating_period.findtext('txc:StartDate', default='', namespaces=_ns).strip()
+					# 	_end_date = _operating_period.findtext('txc:EndDate', default='', namespaces=_ns).strip()
 
-				# if _operating_period is not None:
-				# 	_start_date = _operating_period.findtext('txc:StartDate', default='', namespaces=_ns).strip()
-				# 	_end_date = _operating_period.findtext('txc:EndDate', default='', namespaces=_ns).strip()
+					# 	if not compareDates(_start_date, _end_date):
+					# 		# print(f'{_dir}/{_file} is out of date: {_start_date} ~ {_end_date}.')
+					# 		_out_of_date_count = _out_of_date_count + 1
+					# 		continue
 
-				# 	if not compareDates(_start_date, _end_date):
-				# 		# print(f'{_dir}/{_file} is out of date: {_start_date} ~ {_end_date}.')
-				# 		_out_of_date_count = _out_of_date_count + 1
-				# 		continue
+					# 	_data = json.dumps(xmltodict.parse(_content), ensure_ascii=False, separators=(',', ':'))
+					# 	_data = _data.replace('@', '')
 
-				# 	_data = json.dumps(xmltodict.parse(_content), ensure_ascii=False, separators=(',', ':'))
-				# 	_data = _data.replace('@', '')
+					# 	with open(os.path.join(_dir, f'_{os.path.splitext(_file)[0]}.json'), 'w') as f:
+					# 		f.write(_data)
 
-				# 	with open(os.path.join(_dir, f'_{os.path.splitext(_file)[0]}.json'), 'w') as f:
-				# 		f.write(_data)
+					# else:
+					# 	# print(f'{_dir}/{_file} has no operating period.')
+					# 	_no_period_count = _no_period_count + 1
 
-				# else:
-				# 	# print(f'{_dir}/{_file} has no operating period.')
-				# 	_no_period_count = _no_period_count + 1
-
-		# print(f'Processed {_total_count} files. {_out_of_date_count} are out of date and {_no_period_count} have no operating period.')
-	print(f'Processed {_total_count} files. {_out_of_date_count} out of date')
+			# print(f'Processed {_total_count} files. {_out_of_date_count} are out of date and {_no_period_count} have no operating period.')
+		print(f'Processed {_total_count} files. {_out_of_date_count} out of date')
 
 	with open(os.path.join(_data_dir, 'tnds_out_of_date.json'), 'w') as f:
 		f.write(json.dumps(sorted(_out_of_date_file_list), ensure_ascii = False, separators=(',', ':')))
