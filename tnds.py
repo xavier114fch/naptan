@@ -33,6 +33,10 @@ def retryRequest(url):
 
 def isFTPAlive(ftp: FTP) -> bool:
 	try:
+		if ftp.sock is None:
+			print(f'FTP connection is closed')
+			return False
+
 		ftp.voidcmd('NOOP')
 		return True
 
