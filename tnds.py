@@ -1,11 +1,18 @@
 import os, zipfile, json, xmltodict, re, requests
 import xml.etree.ElementTree as ET
-from ftplib import FTP
+from ftplib import FTP, error_temp
 from datetime import datetime, timedelta
+from tenacity import retry, wait_fixed, stop_after_attempt, retry_if_exception_type
 
 _data_dir = 'data/tnds'
 _nptg_dir = 'data/nptg'
 _naptan_dir = 'data/naptan'
+
+@retry(
+	wait = wait_fixed(5),
+	stop = stop_after_attempt(3),
+	retry = retry_if_exception_type((ConnectionResetError, error_temp))
+)
 
 def retryRequest(url):
 	while True:
@@ -35,7 +42,7 @@ def fetchTndsData(_data_dir):
 		raise RuntimeError('Missing FTP credentials from env variables.')
 
 	# Connect to the FTP server
-	_ftp = FTP(_ftp_host)
+	_ftp = FTP(_ftp_host, timeout=30)
 	_ftp.login(_ftp_username, _ftp_password)
 	_ftp.set_pasv(True) # Enable passive mode
 
