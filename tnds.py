@@ -910,199 +910,199 @@ def outputTnds(_data_dir):
 
 
 def getStopPointsFromTnds(_data_dir):
-	def openNptgLocalities() -> bool:
-		global _locality_list
-		try:
-			_response = retryRequest('https://xavier114fch.github.io/naptan/data/nptg/nptg_localities.json')
-			_locality_list = _response.json()
-			# with open(os.path.join(f'{_nptg_dir}','nptg_localities.json'), 'r') as f:
-			# 	_locality_list = json.load(f)
+	# def openNptgLocalities() -> bool:
+	# 	global _locality_list
+	# 	try:
+	# 		_response = retryRequest('https://xavier114fch.github.io/naptan/data/nptg/nptg_localities.json')
+	# 		_locality_list = _response.json()
+	# 		# with open(os.path.join(f'{_nptg_dir}','nptg_localities.json'), 'r') as f:
+	# 		# 	_locality_list = json.load(f)
 
-		except BaseException:
-			print('Cannot open NPTG locality list.')
+	# 	except BaseException:
+	# 		print('Cannot open NPTG locality list.')
 
-		else:
-			return True
+	# 	else:
+	# 		return True
 
-	def openNaptan() -> bool:
-		global _naptan_list
-		try:
-			_response = retryRequest('https://xavier114fch.github.io/naptan/data/naptan/naptan_stop_points_all.json')
-			_naptan_list = _response.json()
-			# with open(os.path.join(f'{_naptan_dir}','naptan_stop_points_all.json'), 'r') as f:
-			# 	_naptan_list = json.load(f)
+	# def openNaptan() -> bool:
+	# 	global _naptan_list
+	# 	try:
+	# 		_response = retryRequest('https://xavier114fch.github.io/naptan/data/naptan/naptan_stop_points_all.json')
+	# 		_naptan_list = _response.json()
+	# 		# with open(os.path.join(f'{_naptan_dir}','naptan_stop_points_all.json'), 'r') as f:
+	# 		# 	_naptan_list = json.load(f)
 
-		except BaseException:
-			print('Cannot open Naptan list.')
+	# 	except BaseException:
+	# 		print('Cannot open Naptan list.')
 
-		else:
-			return True
+	# 	else:
+	# 		return True
 
-	try:
-		openNptgLocalities() and openNaptan()
+	# try:
+	# 	openNptgLocalities() and openNaptan()
 
-	except BaseException:
-		pass
+	# except BaseException:
+	# 	pass
 
-	else:
-		_all_stops = {}
-		_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))])
+	# else:
+	_all_stops = {}
+	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item)) and _item != 'stopPoints'])
 
-		for _directory in _directories:
-			print(f'Getting stop points in {_directory} ...')
+	for _directory in _directories:
+		print(f'Getting stop points in {_directory} ...')
 
-			# NCSD XMLs are in one level deeper
-			_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
+		# NCSD XMLs are in one level deeper
+		_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
 
-			for _file in sorted(os.listdir(_dir)):
-				if _file.startswith('_') and _file.endswith('.json'):
-					with open(os.path.join(_dir, _file), 'r') as f:
-						# print(f'{_directory}/{_file}')
+		for _file in sorted(os.listdir(_dir)):
+			if _file.startswith('_') and _file.endswith('.json'):
+				with open(os.path.join(_dir, _file), 'r') as f:
+					# print(f'{_directory}/{_file}')
 
-						_data = json.load(f)
+					_data = json.load(f)
 
-						_stop_points = _data.get('TransXChange', {}).get('StopPoints', {})
-						_atco_code, _name, _locality_ref, _locality_name, _origin, _dest, _slug = '', '', '', '', '', '', ''
-						_line_names = []
+					_stop_points = _data.get('TransXChange', {}).get('StopPoints', {})
+					_atco_code, _name, _locality_ref, _locality_name, _origin, _dest, _slug = '', '', '', '', '', '', ''
+					_line_names = []
 
-						_services = _data.get('TransXChange', {}).get('Services', {}).get('Service', {})
+					_services = _data.get('TransXChange', {}).get('Services', {}).get('Service', {})
 
-						if not isinstance(_services, list):
-							_services = [_services]
+					if not isinstance(_services, list):
+						_services = [_services]
 
-						for _service in _services:
-							_line_list = _service.get('Lines', {}).get('Line', [])
+					for _service in _services:
+						_line_list = _service.get('Lines', {}).get('Line', [])
 
-							if isinstance(_line_list, list):
-								for _line in _line_list:
-									_line_names.append(_line.get('LineName', ''))
+						if isinstance(_line_list, list):
+							for _line in _line_list:
+								_line_names.append(_line.get('LineName', ''))
 
-							else:
-								_line_names.append(_line_list.get('LineName', ''))
+						else:
+							_line_names.append(_line_list.get('LineName', ''))
 
-							_standard_service = _service.get('StandardService', {})
-							_origin = _standard_service.get('Origin', '')
-							_dest = _standard_service.get('Destination', '')
+						_standard_service = _service.get('StandardService', {})
+						_origin = _standard_service.get('Origin', '')
+						_dest = _standard_service.get('Destination', '')
 
-							_line_name_list = '+'.join(_line_names)
-							_safe_chars = re.compile(r'[^a-zA-Z0-9\-\+]')
-							_slug = (f'{_line_name_list}-{_origin.replace(' / ', ' ').replace(' ', '-')}-{_dest.replace(' / ', ' ').replace(' ', '-')}').lower()
-							_slug = _safe_chars.sub('', _slug)
+						_line_name_list = '+'.join(_line_names)
+						_safe_chars = re.compile(r'[^a-zA-Z0-9\-\+]')
+						_slug = (f'{_line_name_list}-{_origin.replace(' / ', ' ').replace(' ', '-')}-{_dest.replace(' / ', ' ').replace(' ', '-')}').lower()
+						_slug = _safe_chars.sub('', _slug)
 
-							if 'StopPoint' in _stop_points:
-								_stops = _stop_points.get('StopPoint', [])
+						if 'StopPoint' in _stop_points:
+							_stops = _stop_points.get('StopPoint', [])
 
-								if not isinstance(_stops, list):
-									_stops = [_stops]
+							if not isinstance(_stops, list):
+								_stops = [_stops]
 
-								for _stop in _stops:
-									_is_naptan = False
-									_naptan_code, _indicator, _compass, _timing_status = '', '', '', ''
+							for _stop in _stops:
+								_is_naptan = False
+								_naptan_code, _indicator, _compass, _timing_status = '', '', '', ''
 
-									_name = _stop.get('Descriptor', {}).get('CommonName', '')
-									_locality_ref = _stop.get('Place', {}).get('NptgLocalityRef', '')
+								_name = _stop.get('Descriptor', {}).get('CommonName', '')
+								_locality_ref = _stop.get('Place', {}).get('NptgLocalityRef', '')
 
-									if _locality_ref in _locality_list:
-										# _locality_name = _locality_list.get(_locality_ref, {}).get('Descriptor', {}).get('LocalityName', '')
-										_locality_name = _locality_list[_locality_ref].get('name', {})
+								# if _locality_ref in _locality_list:
+								# 	# _locality_name = _locality_list.get(_locality_ref, {}).get('Descriptor', {}).get('LocalityName', '')
+								# 	_locality_name = _locality_list[_locality_ref].get('name', {})
 
-									_atco_code = _stop.get('AtcoCode', '')
+								_atco_code = _stop.get('AtcoCode', '')
 
-									if _atco_code in _naptan_list:
-										_is_naptan = True
+								# if _atco_code in _naptan_list:
+								# 	_is_naptan = True
 
-										_response = retryRequest(f'https://xavier114fch.github.io/naptan/data/naptan//stopPoints/{_atco_code}.json')
-										_naptan = _response.json()
+								# 	_response = retryRequest(f'https://xavier114fch.github.io/naptan/data/naptan/stopPoints/{_atco_code}.json')
+								# 	_naptan = _response.json()
 
-										_naptan_code = _naptan.get(_atco_code, {}).get('naptanCode', '')
-										_indicator = _naptan.get(_atco_code, {}).get('indicator', '')
-										_compass = _naptan.get(_atco_code, {}).get('properties', {},).get('bearing', '')
-										_timing_status = _naptan.get(_atco_code, {}).get('properties', {},).get('timingStatus', '')
-										_coords = _naptan.get(_atco_code, {}).get('coordinates', [])
+								# 	_naptan_code = _naptan.get(_atco_code, {}).get('naptanCode', '')
+								# 	_indicator = _naptan.get(_atco_code, {}).get('indicator', '')
+								# 	_compass = _naptan.get(_atco_code, {}).get('properties', {},).get('bearing', '')
+								# 	_timing_status = _naptan.get(_atco_code, {}).get('properties', {},).get('timingStatus', '')
+								# 	_coords = _naptan.get(_atco_code, {}).get('coordinates', [])
 
-									if _atco_code not in _all_stops:
-										_all_stops.setdefault(_atco_code, {
-											'naptanCode': _naptan_code,
-											'name': _name,
-											'localityRef': _locality_ref,
-											'localityName': _locality_name,
-											'indicator': _indicator,
-											'compass': _compass,
-											'timingStatus': _timing_status,
-											'slugs': [_slug],
-											'coordinates': _coords
-											# 'isNaptan': _is_naptan
-										})
+								if _atco_code not in _all_stops:
+									_all_stops.setdefault(_atco_code, {
+										# 'naptanCode': _naptan_code,
+										'name': _name,
+										'localityRef': _locality_ref,
+										# 'localityName': _locality_name,
+										# 'indicator': _indicator,
+										# 'compass': _compass,
+										# 'timingStatus': _timing_status,
+										'slugs': [_slug],
+										# 'coordinates': _coords
+										# 'isNaptan': _is_naptan
+									})
 
-									else:
-										_slugs = _all_stops.get(_atco_code, {}).get('slugs', [])
-										if _slug not in _slugs:
-											_slugs.append(_slug)
+								else:
+									_slugs = _all_stops.get(_atco_code, {}).get('slugs', [])
+									if _slug not in _slugs:
+										_slugs.append(_slug)
 
-							elif 'AnnotatedStopPointRef' in _stop_points:
-								_stops = _stop_points.get('AnnotatedStopPointRef', [])
+						elif 'AnnotatedStopPointRef' in _stop_points:
+							_stops = _stop_points.get('AnnotatedStopPointRef', [])
 
-								if not isinstance(_stops, list):
-									_stops = [_stops]
+							if not isinstance(_stops, list):
+								_stops = [_stops]
 
-								for _stop in _stops:
-									_is_naptan = False
-									_naptan_code, _indicator, _compass, _timing_status = '', '', '', ''
+							for _stop in _stops:
+								_is_naptan = False
+								_naptan_code, _indicator, _compass, _timing_status = '', '', '', ''
 
-									_name = _stop.get('CommonName', '')
-									_locality_name = _stop.get('LocalityName', '')
-									_atco_code = _stop.get('StopPointRef', '')
+								_name = _stop.get('CommonName', '')
+								_locality_name = _stop.get('LocalityName', '')
+								_atco_code = _stop.get('StopPointRef', '')
 
-									if _atco_code in _naptan_list:
-										_is_naptan = True
+								# if _atco_code in _naptan_list:
+								# 	_is_naptan = True
 
-										_response = retryRequest(f'https://xavier114fch.github.io/naptan/data/naptan//stopPoints/{_atco_code}.json')
-										_naptan = _response.json()
+								# 	_response = retryRequest(f'https://xavier114fch.github.io/naptan/data/naptan//stopPoints/{_atco_code}.json')
+								# 	_naptan = _response.json()
 
-										_naptan_code = _naptan.get(_atco_code, {}).get('naptanCode', '')
-										_indicator = _naptan.get(_atco_code, {}).get('indicator', '')
-										_compass = _naptan.get(_atco_code, {}).get('properties', {},).get('bearing', '')
-										_timing_status = _naptan.get(_atco_code, {}).get('properties', {},).get('timingStatus', '')
-										_coords = _naptan.get(_atco_code, {}).get('coordinates', '')
+								# 	_naptan_code = _naptan.get(_atco_code, {}).get('naptanCode', '')
+								# 	_indicator = _naptan.get(_atco_code, {}).get('indicator', '')
+								# 	_compass = _naptan.get(_atco_code, {}).get('properties', {},).get('bearing', '')
+								# 	_timing_status = _naptan.get(_atco_code, {}).get('properties', {},).get('timingStatus', '')
+									_coords = _naptan.get(_atco_code, {}).get('coordinates', '')
 
-									if _atco_code not in _all_stops:
-										_all_stops.setdefault(_atco_code, {
-											'naptanCode': _naptan_code,
-											'name': _name,
-											'localityRef': _locality_ref,
-											'localityName': _locality_name,
-											'indicator': _indicator,
-											'compass': _compass,
-											'timingStatus': _timing_status,
-											'slugs': [_slug],
-											'coordinates': _coords
-											# 'isNaptan': _is_naptan
-										})
+								if _atco_code not in _all_stops:
+									_all_stops.setdefault(_atco_code, {
+										# 'naptanCode': _naptan_code,
+										'name': _name,
+										'localityRef': _locality_ref,
+										# 'localityName': _locality_name,
+										# 'indicator': _indicator,
+										# 'compass': _compass,
+										# 'timingStatus': _timing_status,
+										'slugs': [_slug],
+										# 'coordinates': _coords
+										# 'isNaptan': _is_naptan
+									})
 
-									else:
-										_slugs = _all_stops.get(_atco_code, {}).get('slugs', [])
-										if _slug not in _slugs:
-											_slugs.append(_slug)
-							
-							else:
-								print(f'{_data_dir}/{_directory}/{_file} does not have any stop points.') 
+								else:
+									_slugs = _all_stops.get(_atco_code, {}).get('slugs', [])
+									if _slug not in _slugs:
+										_slugs.append(_slug)
+						
+						else:
+							print(f'{_data_dir}/{_directory}/{_file} does not have any stop points.') 
 
 		# with open(os.path.join(_data_dir, 'all_stop_points.json'), 'w') as f:
 		# 	f.write(json.dumps(_all_stops, ensure_ascii = False, separators=(',', ':')))
 		# 	_len = len(_all_stops)
 		# 	print(f'Created {_len} stops.')
 
-		print('Splitting StopPoints ...')
-		os.makedirs(f'{_data_dir}/stopPoints', exist_ok=True)
-		for _k, _v in _all_stops.items():
-			_d = {}
-			_d[_k] = _v
+	with open(os.path.join(f'{_data_dir}', f'all_stop_points.json'), 'w') as f:
+		f.write(json.dumps(list(_all_stops.keys()), ensure_ascii = False, separators=(',', ':')))
 
-			with open(os.path.join(f'{_data_dir}/stopPoints', f'{_k}.json'), 'w') as f:
-				f.write(json.dumps(_d, ensure_ascii = False, separators=(',', ':')))
+	print('Splitting StopPoints ...')
+	os.makedirs(f'{_data_dir}/stopPoints', exist_ok=True)
+	for _k, _v in _all_stops.items():
+		_d = {}
+		_d[_k] = _v
 
-		with open(os.path.join(f'{_data_dir}', f'all_stop_points.json'), 'w') as f:
-			f.write(json.dumps([_k for _k in _all_stops], ensure_ascii = False, separators=(',', ':')))
+		with open(os.path.join(f'{_data_dir}/stopPoints', f'{_k}.json'), 'w') as f:
+			f.write(json.dumps(_d, ensure_ascii = False, separators=(',', ':')))
 
 def compareStopPoints(_data_dir):
 	def openTndsStopPoints() -> bool:
@@ -1140,12 +1140,12 @@ def compareStopPoints(_data_dir):
 	else:
 		_common_naptan = set(_tnds_stop_list) & set(_naptan_list)
 
-		_stops_in_tnds = {_k: _v for _k, _v in _tnds_stop_list.items() if _k not in _common_naptan}
+		_stops_in_tnds = [_k for _k in _tnds_stop_list if _k not in _common_naptan]
 		# _stops_in_naptan = {_k:_v for _k, _v in _naptan_list.items() if _k not in _common_naptan}
 
 		with open(os.path.join(_data_dir, 'stops_tnds_only.json'), 'w') as f:
 			f.write(json.dumps(_stops_in_tnds, ensure_ascii = False, separators=(',', ':')))
-			print(f'There are {len(list(_stops_in_tnds.keys()))} stop points only appear in TNDS')
+			print(f'There are {len(_stops_in_tnds)} stop points only appear in TNDS')
 
 		# print('Stops only in TNDS:')
 		# print(list(_stops_in_tnds.keys()))
@@ -1318,8 +1318,8 @@ def main():
 	fetchTndsData(_data_dir)
 	convertTnds(_data_dir)
 	outputTnds(_data_dir)
-	# getStopPointsFromTnds(_data_dir)
-	# compareStopPoints(_data_dir)
+	getStopPointsFromTnds(_data_dir)
+	compareStopPoints(_data_dir)
 	# generateTimetables(_data_dir)
 
 if __name__ == "__main__":
