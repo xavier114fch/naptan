@@ -57,6 +57,6 @@ jobs:
             target-folder: data/
             folder: data
             commit-message: |
-              Update TNDS at $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+              "Update TNDS at $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
             branch: gh-pages
             clean: false
