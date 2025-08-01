@@ -1,6 +1,6 @@
 import os, zipfile, json, xmltodict, re, requests
 import xml.etree.ElementTree as ET
-from ftplib import FTP, error_temp
+from ftplib import FTP, error_temp, error_perm, all_errors
 from datetime import datetime, timedelta
 from tenacity import retry, wait_fixed, stop_after_attempt, retry_if_exception_type
 
@@ -31,6 +31,15 @@ def retryRequest(url):
 		else:
 			raise Exception(r.status_code, url)
 
+def isFTPAlive(ftp: FTP) -> bool:
+	try:
+		ftp.voidcmd('NOOP')
+		return True
+
+	except all_errors as e:
+		print(f'FTP connection is dropped: {e}')
+		return False
+
 def fetchTndsData(_data_dir):
 	# FTP server details
 	_ftp_host = 'ftp.tnds.basemap.co.uk'
@@ -54,6 +63,12 @@ def fetchTndsData(_data_dir):
 
 	# Fetch each file
 	for _file_name in _file_list:
+		if not isFTPAlive(_ftp):
+			# Connect to the FTP server
+			_ftp = FTP(_ftp_host, timeout=30)
+			_ftp.login(_ftp_username, _ftp_password)
+			_ftp.set_pasv(True) # Enable passive mode
+
 		_response = _ftp.sendcmd(f'MDTM {_file_name}')
 		_remote_timestamp = datetime.strptime(_response[4:], '%Y%m%d%H%M%S')
 
@@ -64,7 +79,14 @@ def fetchTndsData(_data_dir):
 			print(f'Getting {_file_name} from TNDS FTP ...')
 			os.makedirs(_data_dir, exist_ok=True)
 			with open(_local_file_path, 'wb') as _local_file:
+				if not isFTPAlive(_ftp):
+					# Connect to the FTP server
+					_ftp = FTP(_ftp_host, timeout=30)
+					_ftp.login(_ftp_username, _ftp_password)
+					_ftp.set_pasv(True) # Enable passive mode
+
 				 _ftp.retrbinary(f'RETR {_file_name}', _local_file.write)
+				 _ftp.quit()
 
 			if _file_name.endswith('.zip'):
 				print(f'Unzipping {_file_name} ...')
@@ -76,7 +98,8 @@ def fetchTndsData(_data_dir):
 			print(f'{_file_name} is up to date.')
 
 	# Disconnect from the FTP server
-	_ftp.quit()
+	if isFTPAlive(_ftp):
+		_ftp.quit()
 	print('=====')
 
 
@@ -176,7 +199,7 @@ def convertTnds(_data_dir, _working_dir):
 				# 	_no_period_count = _no_period_count + 1
 
 		# print(f'Processed {_total_count} files. {_out_of_date_count} are out of date and {_no_period_count} have no operating period.')
-		print(f'Processed {_total_count} files. {_out_of_date_count} out of date')
+	print(f'Processed {_total_count} files. {_out_of_date_count} out of date')
 
 	with open(os.path.join(_data_dir, 'tnds_out_of_date.json'), 'w') as f:
 		f.write(json.dumps(sorted(_out_of_date_file_list), ensure_ascii = False, separators=(',', ':')))
