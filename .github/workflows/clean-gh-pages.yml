@@ -21,7 +21,6 @@ jobs:
       - name: Create new gh-pages branch
         run: |
           git switch --orphan gh-pages
-          git rm -rf .
           touch README.md
           git add README.md
           git config --global user.name 'github-actions[bot]'
