@@ -127,7 +127,7 @@ def convertTnds(_data_dir, _working_dir):
 	for _directory in _directories:
 		print(f'Converting TNDS XML files in {_directory} ...')
 
-		NCSD XMLs are in one level deeper
+		# NCSD XMLs are in one level deeper
 		_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
 
 		_total_count, _out_of_date_count = 0, 0
