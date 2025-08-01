@@ -1,4 +1,4 @@
-import os, zipfile, json, xmltodict, re
+import os, zipfile, json, xmltodict, re, requests
 import xml.etree.ElementTree as ET
 from ftplib import FTP
 from datetime import datetime, timedelta
@@ -6,6 +6,23 @@ from datetime import datetime, timedelta
 _data_dir = 'data/tnds'
 _nptg_dir = 'data/nptg'
 _naptan_dir = 'data/naptan'
+
+def retryRequest(url):
+	while True:
+		r = requests.get(url)
+
+		if r.status_code == 200:
+			return r
+
+		elif r.status_code == 400 or r.status_code == 404:
+			raise Exception(r.status_code, url)
+			break
+
+		elif r.status_code == 429:
+			time.sleep(10)
+
+		else:
+			raise Exception(r.status_code, url)
 
 def fetchTndsData(_data_dir):
 	# FTP server details
@@ -862,7 +879,7 @@ def getStopPointsFromTnds(_data_dir):
 	def openNptgLocalities() -> bool:
 		global _locality_list
 		try:
-			_response = retryRequest('https://raw.githubusercontent.com/xavier114fch/naptan/refs/heads/gh-pages/data/nptg/nptg_localities.json')
+			_response = retryRequest('https://xavier114fch.github.io/naptan/data/nptg/nptg_localities.json')
 			_locality_list = _response.json()
 			# with open(os.path.join(f'{_nptg_dir}','nptg_localities.json'), 'r') as f:
 			# 	_locality_list = json.load(f)
@@ -876,7 +893,7 @@ def getStopPointsFromTnds(_data_dir):
 	def openNaptan() -> bool:
 		global _naptan_list
 		try:
-			_response = retryRequest('https://raw.githubusercontent.com/xavier114fch/naptan/refs/heads/gh-pages/data/naptan/naptan_stop_points_all.json')
+			_response = retryRequest('https://xavier114fch.github.io/naptan/data/naptan/naptan_stop_points_all.json')
 			_naptan_list = _response.json()
 			# with open(os.path.join(f'{_naptan_dir}','naptan_stop_points_all.json'), 'r') as f:
 			# 	_naptan_list = json.load(f)
@@ -1069,7 +1086,7 @@ def compareStopPoints(_data_dir):
 	def openNaptan() -> bool:
 		global _naptan_list
 		try:
-			_response = retryRequest('https://raw.githubusercontent.com/xavier114fch/naptan/refs/heads/gh-pages/data/naptan/naptan_stop_points_all.json')
+			_response = retryRequest('https://xavier114fch.github.io/naptan/data/naptan/naptan_stop_points_all.json')
 			_naptan_list = _response.json()
 			# with open(os.path.join(f'{_naptan_dir}','naptan_stop_points_all.json'), 'r') as f:
 			# 	_naptan_list = json.load(f)
