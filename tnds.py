@@ -104,8 +104,9 @@ def convertTnds(_data_dir, _working_dir):
 		# _dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
 
 	_total_count, _out_of_date_count = 0, 0
+	_dir = f'{_data_dir}/{_working_dir}'
 
-	for _file in sorted(os.listdir(f'{_data_dir}/{_working_dir}')):
+	for _file in sorted(os.listdir(_dir)):
 		if _file.endswith('.xml'):
 			# print(f'Converting TNDS XML file {_dir}/{_file} ...')
 			_total_count = _total_count + 1
