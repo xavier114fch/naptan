@@ -28,6 +28,9 @@ jobs:
       - name: Fetch NPTG
         run: |
           python nptg.py
+
+      - name: Cleanup
+        run: |
           rm -f data/nptg/nptg.xml data/nptg/nptg.json
 
       - name: Deploy to gh-pages
