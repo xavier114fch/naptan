@@ -20,7 +20,7 @@ jobs:
           remove-haskell: 'true'
           remove-codeql: 'true'
           remove-docker-images: 'true'
-          
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -42,7 +42,7 @@ jobs:
           TNDS_FTP_PWD: ${{ secrets.TNDS_FTP_PWD }}
         run: |
           python tnds.py
-          find data/tnds -maxdepth 1 -type f -name '*.zip -delete
+          find data/tnds -maxdepth 1 -type f -name '*.zip' -delete
           find data/tnds -maxdepth 1 -type f -name 'servicereport.csv' -delete
           find data/tnds -maxdepth 1 -type f -name 'log.txt' -delete
           find data/tnds -maxdepth 2 -type f -name '*.xml' -delete
@@ -53,6 +53,6 @@ jobs:
         with:
             target-folder: data/
             folder: data
-            commit-message: "Update resources from ${{ github.run_number }}:${{ github.run_attempt }}"
+            commit-message: 'Update resources from ${{ github.run_number }}:${{ github.run_attempt }}'
             branch: gh-pages
             clean: false
