@@ -34,7 +34,7 @@ jobs:
           rm -f data/nptg/nptg.xml data/nptg/nptg.json
 
       - name: Set commit message with timestamp
-          run: echo "COMMIT_MSG=Update NPTG at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
+        run: echo "COMMIT_MSG=Update NPTG at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
 
       - name: Deploy to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4

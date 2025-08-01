@@ -52,7 +52,7 @@ jobs:
           find data/tnds -maxdepth 2 -type f -name '_*.json' -delete
 
       - name: Set commit message with timestamp
-          run: echo "COMMIT_MSG=Update TNDS at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
+        run: echo "COMMIT_MSG=Update TNDS at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
 
       - name: Deploy to gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
