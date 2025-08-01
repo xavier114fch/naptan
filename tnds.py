@@ -1063,7 +1063,7 @@ def getStopPointsFromTnds(_data_dir):
 								# 	_indicator = _naptan.get(_atco_code, {}).get('indicator', '')
 								# 	_compass = _naptan.get(_atco_code, {}).get('properties', {},).get('bearing', '')
 								# 	_timing_status = _naptan.get(_atco_code, {}).get('properties', {},).get('timingStatus', '')
-									_coords = _naptan.get(_atco_code, {}).get('coordinates', '')
+								#	_coords = _naptan.get(_atco_code, {}).get('coordinates', '')
 
 								if _atco_code not in _all_stops:
 									_all_stops.setdefault(_atco_code, {
