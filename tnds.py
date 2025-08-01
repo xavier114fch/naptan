@@ -70,7 +70,8 @@ def fetchTndsData(_data_dir):
 				print(f'Unzipping {_file_name} ...')
 				_zip_file_path = os.path.join(_data_dir, _file_name)
 				extract_zip(_zip_file_path, _data_dir)
-				convertTnds(_data_dir)
+				_folder = os.path.splitext(os.path.basename(_file_name))[0]
+				convertTnds(f'{_data_dir}/{_folder}')
 
 		else:
 			print(f'{_file_name} is up to date.')
@@ -105,7 +106,7 @@ def convertTnds(_data_dir):
 
 	_total_count, _out_of_date_count = 0, 0
 
-	for _file in sorted(os.listdir(_dir)):
+	for _file in sorted(os.listdir(_data_dir)):
 		if _file.endswith('.xml'):
 			# print(f'Converting TNDS XML file {_dir}/{_file} ...')
 			_total_count = _total_count + 1
