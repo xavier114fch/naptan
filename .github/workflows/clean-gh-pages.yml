@@ -11,21 +11,22 @@ jobs:
       - name: Checkout gh-pages branch
         uses: actions/checkout@v4
         with:
-          ref: gh-pages
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
           fetch-depth: 1
 
-      - name: Remove all files
+      - name: Delete remote gh-pages branch
         run: |
+          git push origin --delete gh-pages || echo "gh-pages branch doesn't exist"
+
+      - name: Create new gh-pages branch
+        run: |
+          git switch --orphan gh-pages
           git rm -rf .
-          # rm -rf ./* .[^.]* || true  # Remove everything including hidden files
-          
           touch README.md
           git add README.md
-
-          git config --global user.name "Xavier Fung"
-          git config --global user.email "1157303+xavier114fch@users.noreply.github.com"
-          git commit -m "Clear gh-pages branch" || echo "Nothing to commit"
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git commit -m "Reset gh-pages branch" || echo "Nothing to commit"
 
       - name: Push changes
         run: |

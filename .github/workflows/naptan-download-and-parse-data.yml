@@ -39,6 +39,7 @@ jobs:
         with:
             target-folder: data/
             folder: data
-            commit-message: "Update resources from ${{ github.run_number }}:${{ github.run_attempt }}"
+            commit-message: |
+              Update Naptan at $(date -u +"%Y-%m-%d %H:%M:%S UTC")
             branch: gh-pages
             clean: false
