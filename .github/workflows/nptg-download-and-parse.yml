@@ -38,7 +38,6 @@ jobs:
         with:
             target-folder: data/
             folder: data
-            commit-message: |
-              "Update NPTG at $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            commit-message: "Update NPTG at $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
             branch: gh-pages
             clean: false
