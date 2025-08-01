@@ -8,12 +8,6 @@ _data_dir = 'data/tnds'
 _nptg_dir = 'data/nptg'
 _naptan_dir = 'data/naptan'
 
-@retry(
-	wait = wait_fixed(5),
-	stop = stop_after_attempt(3),
-	retry = retry_if_exception_type((ConnectionResetError, error_temp))
-)
-
 def retryRequest(url):
 	while True:
 		r = requests.get(url)
@@ -44,6 +38,11 @@ def isFTPAlive(ftp: FTP) -> bool:
 		print(f'FTP connection is dropped: {e}')
 		return False
 
+@retry(
+	wait = wait_fixed(5),
+	stop = stop_after_attempt(3),
+	retry = retry_if_exception_type((ConnectionResetError, error_temp))
+)
 def fetchTndsData(_data_dir):
 	# FTP server details
 	_ftp_host = 'ftp.tnds.basemap.co.uk'
