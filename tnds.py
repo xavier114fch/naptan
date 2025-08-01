@@ -113,7 +113,7 @@ def extract_zip(zip_file_path, extract_directory):
 		extract_path = os.path.join(extract_directory, zip_name)
 		zip_ref.extractall(extract_path)
 
-def convertTnds(_data_dir, _working_dir):
+def convertTnds(_data_dir):
 	_directories = [_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))]
 
 	if os.path.exists(f'{_data_dir}/tnds_out_of_date.json'):
