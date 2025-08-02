@@ -37,7 +37,7 @@ def retryRequest(url):
 
 def getAtcoList():
 	try:
-		_data = retryRequest('https://xavier114fch.github.io/naptan/data/nptg/nptg_atcoareas.json')
+		_data = retryRequest('https://github.com/xavier114fch/naptan/raw/gh-pages/data/nptg/nptg_atcoareas.json')
 		# with open(os.path.join(nptg_dir, 'nptg_atcoareas.json'), 'r') as f:
 		# 	_data = json.load(f)
 
