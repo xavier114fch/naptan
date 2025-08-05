@@ -1,6 +1,6 @@
 import time, os, requests, json, xmltodict, re
 
-data_dir = '/Users/xavier/Documents/naptan/data/bods'
+data_dir = 'data/bods'
 
 def retryRequest(url):
 	while True:
