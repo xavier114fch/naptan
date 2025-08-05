@@ -55,6 +55,7 @@ def getNoc():
 	_data = json.dumps(xmltodict.parse(_data), ensure_ascii = False, separators=(',', ':'))
 	_data = _data.replace('@', '')
 
+	os.makedirs(data_dir, exist_ok=True)
 	with open(os.path.join(data_dir, f'noc.json'), 'w') as f:
 		f.write(_data)
 
