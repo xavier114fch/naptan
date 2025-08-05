@@ -2,7 +2,7 @@ name: TNDS Download and Parse Data
 
 on:
   schedule:
-    - cron: '0 9 * * *'
+    - cron: '30 8,20 * * *'
   workflow_dispatch:
 
 jobs:

@@ -2,7 +2,7 @@ name: Naptan Download and Parse Data
 
 on:
   schedule:
-    - cron: '30 8 * * *'
+    - cron: '0 8,20 * * *'
   workflow_dispatch:
 
 jobs:
