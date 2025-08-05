@@ -22,6 +22,10 @@ def retryRequest(url):
 def fetchTfLRef():
 	_api_key = os.environ.get('TFL_API_KEY')
 
+	# Test env variables
+	if not _api_key:
+		raise RuntimeError('Missing TfL API key from env variables.')
+
 	def fetchBods(_api_key):
 		try:
 			_data = retryRequest(f'https://data.bus-data.dft.gov.uk/api/v1/datafeed/?operatorRef=TFLO&api_key={_api_key}')
