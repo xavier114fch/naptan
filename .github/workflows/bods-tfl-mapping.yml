@@ -26,6 +26,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Mapping BODS lineRef with TfL route numbers
+        env:
+          TFL_API_KEY: ${{ secrets.TFL_API_KEY }}
         run: |
           python bods.py
 
