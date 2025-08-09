@@ -669,9 +669,8 @@ def outputTnds(_data_dir):
 										_lon = _track_location.get('Translation', _track_location.get('Longitude', None)).get('Longitude', None)
 										_lat = _track_location.get('Translation', _track_location.get('Latitude', None)).get('Latitude', None)
 
-										_lon = float(_lon) if _lon is not None
-										_lat = float(_lat) if _lat is not None
-										_tracks.append([_lon, _lat])
+										if _lon and _lat:
+											_tracks.append([float(_lon), float(_lat)])
 
 								_link = _links[-1]
 								_stop_points.append(_link.get('To', {}).get('StopPointRef', ''))
@@ -732,9 +731,8 @@ def outputTnds(_data_dir):
 										_lon = _track_location.get('Translation', _track_location.get('Longitude', None)).get('Longitude', None)
 										_lat = _track_location.get('Translation', _track_location.get('Latitude', None)).get('Latitude', None)
 
-										_lon = float(_lon) if _lon is not None
-										_lat = float(_lat) if _lat is not None
-										_tracks.append([_lon, _lat])
+										if _lon and _lat:
+											_tracks.append([float(_lon), float(_lat)])
 
 								_link = _links[-1]
 								_stop_points.append(_link.get('To', {}).get('StopPointRef', ''))
