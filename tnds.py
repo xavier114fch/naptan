@@ -628,7 +628,7 @@ def outputTnds(_data_dir):
 							for _route in _route_list:
 								_route_id = _route.get('id', '')
 								_route_section_ref = _route.get('RouteSectionRef', [])
-								_stop_points, _distance, _direction = [], [], []
+								_stop_points, _distance, _tracks, _direction = [], [], [], []
 
 								if not isinstance(_route_section_ref, list):
 									_route_section_ref = [_route_section_ref]
@@ -659,6 +659,20 @@ def outputTnds(_data_dir):
 									_distance.append(int(_d) if _d is not None else None)
 									_direction.append(_link.get('Direction', ''))
 
+									_track_locations = _link.get('Track', {}).get('Mapping', {}).get('Location', [])
+
+									if not _track_locations:
+										print(f'{_directory}/{_file}: Missing Track')
+										continue
+
+									for _track_location in _track_locations:
+										_lon = _track_location.get('Translation', _track_location.get('Longitude', None)).get('Longitude', None)
+										_lat = _track_location.get('Translation', _track_location.get('Latitude', None)).get('Latitude', None)
+
+										_lon = float(_lon) if _lon is not None
+										_lat = float(_lat) if _lat is not None
+										_tracks.append([_lon, _lat])
+
 								_link = _links[-1]
 								_stop_points.append(_link.get('To', {}).get('StopPointRef', ''))
 
@@ -668,6 +682,7 @@ def outputTnds(_data_dir):
 									'description': _route.get('Description', ''),
 									'stopPoints' : _stop_points,
 									'distance': _distance,
+									'tracks': _tracks,
 									'direction': _direction
 								})
 
@@ -678,7 +693,7 @@ def outputTnds(_data_dir):
 								_journey_pattern_list = [_journey_pattern_list]
 
 							for _journey_pattern in _journey_pattern_list:
-								_stop_points, _distance, _direction = [], [], []
+								_stop_points, _distance, _tracks, _direction = [], [], [], []
 								_journey_pattern_section_ref_list = _journey_pattern.get('JourneyPatternSectionRefs', [])
 
 								if not isinstance(_journey_pattern_section_ref_list, list):
@@ -707,6 +722,20 @@ def outputTnds(_data_dir):
 									_distance.append(int(_d) if _d is not None else None)
 									_direction.append(_journey_pattern.get('Direction', ''))
 
+									_track_locations = _link.get('Track', {}).get('Mapping', {}).get('Location', [])
+
+									if not _track_locations:
+										print(f'{_directory}/{_file}: Missing Track')
+										continue
+
+									for _track_location in _track_locations:
+										_lon = _track_location.get('Translation', _track_location.get('Longitude', None)).get('Longitude', None)
+										_lat = _track_location.get('Translation', _track_location.get('Latitude', None)).get('Latitude', None)
+
+										_lon = float(_lon) if _lon is not None
+										_lat = float(_lat) if _lat is not None
+										_tracks.append([_lon, _lat])
+
 								_link = _links[-1]
 								_stop_points.append(_link.get('To', {}).get('StopPointRef', ''))
 
@@ -716,6 +745,7 @@ def outputTnds(_data_dir):
 									'description': _desc,
 									'stopPoints' : _stop_points,
 									'distance': _distance,
+									'tracks': _tracks,
 									'direction': _direction
 								})
 
