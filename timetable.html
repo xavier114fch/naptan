@@ -98,10 +98,10 @@
 
                   var filename = '';
                   if (detail.region == 'NCSD')
-                    filename = `${baseUrl}/data/tnds/${detail.region}/${detail.region}_TXC/${detail.filename}`;
+                    filename = `${detail.region}/${detail.region}_TXC/${detail.filename}`;
 
                   else
-                    filename = `${baseUrl}/data/tnds/${detail.region}/${detail.filename}`;
+                    filename = `${detail.region}/${detail.filename}`;
 
                   slugColumn.textContent = slug;
                   pathColumn.innerHTML = `<a href='#' onclick='getDetails("${slug}", "${filename}");'>${filename}</a>`;
