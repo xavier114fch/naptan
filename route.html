@@ -137,228 +137,258 @@
         .then(stopsTndsOnly => {
 
         fetch(`${baseUrl}/data/tnds/${filename}`)
-        .then(response => response.json())
-        .then(details => {
-          details = details[slug];
+          .then(response => response.json())
+          .then(details => {
+            details = details[slug];
 
-          document.getElementById('details').innerHTML = '';
-          details.forEach((detail) => {
-            var meta = document.createElement('section');
-            meta.id = 'meta';
+            document.getElementById('details').innerHTML = '';
+            details.forEach((detail) => {
+              var meta = document.createElement('section');
+              meta.id = 'meta';
 
-            var metaContent = '';
-            if (detail.region == 'NCSD')
-              metaContent = `<p>${detail.mode.toUpperCase()} / ${detail.region} / ${detail.region}_TXC / ${detail.filename}`;
+              var metaContent = '';
+              if (detail.region == 'NCSD')
+                metaContent = `<p>${detail.mode.toUpperCase()} / ${detail.region} / ${detail.region}_TXC / ${detail.filename}`;
 
-            else
-              metaContent = `<p>${detail.mode.toUpperCase()} / ${detail.region} / ${detail.filename}`;
+              else
+                metaContent = `<p>${detail.mode.toUpperCase()} / ${detail.region} / ${detail.filename}`;
 
-            metaContent += `<br><h3>${detail.name} ${detail.origin} &gt; ${detail.destination}</h3>`;
+              metaContent += `<br><h3>${detail.name} ${detail.origin} &gt; ${detail.destination}</h3>`;
 
-            if (detail.vias.length > 0)
-              metaContent += `<br>via: ${detail.vias}`;
+              if (detail.vias.length > 0)
+                metaContent += `<br>via: ${detail.vias}`;
 
-            metaContent += `<br>${detail.description}`;
-            metaContent += `<br>Operator(s): ${detail.operators}`;
-            metaContent += `<br>Valid from: ${detail.startDate} &gt; ${detail.endDate}`;
-            metaContent += `<br>Last modified: ${detail.lastModified}`;
-            metaContent += '</p>';
+              metaContent += `<br>${detail.description}`;
+              metaContent += `<br>Operator(s): ${detail.operators}`;
+              metaContent += `<br>Valid from: ${detail.startDate} &gt; ${detail.endDate}`;
+              metaContent += `<br>Last modified: ${detail.lastModified}`;
+              metaContent += '</p>';
 
-            meta.innerHTML = metaContent;
-            document.getElementById('details').appendChild(meta);
+              meta.innerHTML = metaContent;
+              document.getElementById('details').appendChild(meta);
 
-            detail.routes.forEach((route, i) => {
-              var routeContent = document.createElement('section');
-              routeContent.innerHTML = `<h4>${route.description} (${route.routeId})</h4>`;
-              document.getElementById('details').appendChild(routeContent);
-              
-              var routeTable = document.createElement('table');
-              var row = document.createElement('tr');
-              row.innerHTML += '<th>#</th>';
-              row.innerHTML += '<th>ATCO</th>';
-              row.innerHTML += '<th>Naptan</th>';
-              row.innerHTML += '<th>Name</th>';
-              // row.innerHTML += '<th>Landmark</th>';
-              // row.innerHTML += '<th>Street</th>';
-              // row.innerHTML += '<th>Crossing</th>';
-              row.innerHTML += '<th>Locality</th>';
-              // row.innerHTML += '<th>Town</th>';
-              // row.innerHTML += '<th>Suburb</th>';
-              row.innerHTML += '<th>Indicator</th>';
-              row.innerHTML += '<th>Compass</th>';
-              row.innerHTML += '<th>Timing Status</th>';
-              row.innerHTML += '<th>Distance</th>';
-              row.innerHTML += '<th>Bound</th>';
-              routeTable.appendChild(row);
+              if (document.getElementById('details').contains(document.getElementById('routes')) == false) {
+                var serviceLabel = document.createElement('label');
+                serviceLabel.for = 'routes';
+                serviceLabel.textContent = 'Routes: ';
 
-              var stopsGeo = {
-                'type': 'FeatureCollection',
-                'features': []
-              };
+                var serviceSelect = document.createElement('select');
+                serviceSelect.id = 'routes';
 
-              var trackGeo = {
-                'type': 'Feature',
-                'geometry': {
-                  type: 'LineString',
-                  coordinates: route.tracks
-                },
-                'properties': {}
-              };
+                serviceSelect.addEventListener('change', (e) => {
+                  var selectedValue = e.target.value;
 
-              route.stopPoints.forEach((stop, j) => {
-                row = document.createElement('tr');
-                var seqColumn = document.createElement('td');
-                var stopColumn = document.createElement('td');
-                var naptanColumn = document.createElement('td');
-                var nameColumn = document.createElement('td');
-                // var landmarkColumn = document.createElement('td');
-                // var streetColumn = document.createElement('td');
-                // var crossingColumn = document.createElement('td');
-                var localityColumn = document.createElement('td');
-                // var townColumn = document.createElement('td');
-                // var suburbColumn = document.createElement('td');
-                var indicatorColumn = document.createElement('td');
-                var compassColumn = document.createElement('td');
-                var distanceColumn = document.createElement('td');
-                var dirColumn = document.createElement('td');
-                var timingColumn = document.createElement('td');
-
-                seqColumn.textContent = j + 1;
-                stopColumn.textContent = stop;
-                distanceColumn.textContent = route.distance[j];
-                dirColumn.textContent = route.direction[j];
-
-                if (!stopsTndsOnly.includes(stop)) {
-                  fetch(`${baseUrl}/data/naptan/stopPoints/${stop}.json`)
-                    .then(response => response.json())
-                    .then(point => {
-                      naptanColumn.textContent = point[stop] ? point[stop].naptanCode : '';
-                      nameColumn.textContent = point[stop] ? point[stop].name : '';
-                      // landmarkColumn.textContent = point[stop] ? point[stop].landmark : '';
-                      // streetColumn.textContent = point[stop] ? point[stop].street : '';
-                      // crossingColumn.textContent = point[stop] ? point[stop].crossing : '';
-                      localityColumn.textContent = point[stop] ? point[stop].locality : '';
-                      // townColumn.textContent = point[stop] ? point[stop].town : '';
-                      // suburbColumn.textContent = point[stop] ? point[stop].suburb : '';
-                      indicatorColumn.textContent = point[stop] ? point[stop].indicator : '';
-                      compassColumn.textContent = point[stop] ? point[stop].properties.bearing : '';
-                      timingColumn.textContent = point[stop] ? point[stop].properties.timingStatus : '';
-
-                      stopsGeo.features.push({
-                        'type': 'Feature',
-                        'geometry': {
-                          'type': 'Point',
-                          'coordinates': point[stop].coordinates
-                        },
-                        'properties': {
-                          'seq': j + 1,
-                          'id': stop,
-                          'name': point[stop] ? point[stop].name : ''
-                        }
+                  if (selectedValue !== "") {
+                    var targetAnchor = document.getElementById(selectedValue);
+                    if (targetAnchor) {
+                      targetAnchor.scrollIntoView({
+                        behavior: 'smooth'
                       });
-                  });
-                } else {
-                  fetch(`${baseUrl}/data/tnds/stopPoints/${stop}.json`)
-                    .then(response => response.json())
-                    .then(point => {
-                      nameColumn.textContent = point[stop] ? point[stop].name : '';
-                    });
-                }
+                    }
+                  }
+                });
+              }
 
-                row.appendChild(seqColumn);
-                row.appendChild(stopColumn);
-                row.appendChild(naptanColumn);
-                row.appendChild(nameColumn);
-                // row.appendChild(landmarkColumn);
-                // row.appendChild(streetColumn);
-                // row.appendChild(crossingColumn);
-                row.appendChild(localityColumn);
-                // row.appendChild(townColumn);
-                // row.appendChild(suburbColumn);
-                row.appendChild(indicatorColumn);
-                row.appendChild(compassColumn);
-                row.appendChild(timingColumn);
-                row.appendChild(distanceColumn);
-                row.appendChild(dirColumn);
+              document.getElementById('details').appendChild(serviceLabel);
+              document.getElementById('details').appendChild(serviceSelect);
+
+              detail.routes.forEach((route, i) => {
+                var serviceOption = document.createElement('option');
+                serviceOption.value = `${route.routeId}`;
+                serviceOption.innerHTML = `${route.description} (${route.routeId})`;
+                document.getElementById('routes').appendChild(serviceOption);
+                h
+                var routeContent = document.createElement('section');
+                routeContent.innerHTML = `<h4>${route.description} (${route.routeId})</h4>`;
+                document.getElementById('details').appendChild(routeContent);
+                
+                var routeTable = document.createElement('table');
+                var row = document.createElement('tr');
+                row.innerHTML += '<th>#</th>';
+                row.innerHTML += '<th>ATCO</th>';
+                row.innerHTML += '<th>Naptan</th>';
+                row.innerHTML += '<th>Name</th>';
+                // row.innerHTML += '<th>Landmark</th>';
+                // row.innerHTML += '<th>Street</th>';
+                // row.innerHTML += '<th>Crossing</th>';
+                row.innerHTML += '<th>Locality</th>';
+                // row.innerHTML += '<th>Town</th>';
+                // row.innerHTML += '<th>Suburb</th>';
+                row.innerHTML += '<th>Indicator</th>';
+                row.innerHTML += '<th>Compass</th>';
+                row.innerHTML += '<th>Timing Status</th>';
+                row.innerHTML += '<th>Distance</th>';
+                row.innerHTML += '<th>Bound</th>';
                 routeTable.appendChild(row);
-              });
-              
-              document.getElementById('details').appendChild(routeTable);
-              // document.getElementById('details').appendChild(document.createElement('br'));
 
-              var routeMap = document.createElement('div');
-              routeMap.id = `map-${i}`;
-              routeMap.classList.add('map');
-              document.getElementById('details').appendChild(routeMap);
+                var stopsGeo = {
+                  'type': 'FeatureCollection',
+                  'features': []
+                };
 
-              var map = new mapboxgl.Map({
-                container: `map-${i}`,
-                style: 'mapbox://styles/mapbox/light-v11',
-                center: [-2.89479, 54.093409],
-                zoom: 4,
-                trackResize: true
-              });
-
-              map.on('load', () => {
-                var bounds = new mapboxgl.LngLatBounds();
-
-                map.addSource('tracks', {
-                  'type': 'geojson',
-                  'data': trackGeo
-                });
-
-                map.addSource('stops', {
-                  'type': 'geojson',
-                  'data': stopsGeo
-                });
-
-                map.addLayer({
-                  'id': 'lines',
-                  'type': 'line',
-                  'source': 'tracks',
-                  'layout': {
-                    'line-join': 'round',
-                    'line-cap': 'round'
+                var trackGeo = {
+                  'type': 'Feature',
+                  'geometry': {
+                    type: 'LineString',
+                    coordinates: route.tracks
                   },
-                  'paint': {
-                    'line-color': '#999',
-                    'line-width': 2
+                  'properties': {}
+                };
+
+                route.stopPoints.forEach((stop, j) => {
+                  row = document.createElement('tr');
+                  var seqColumn = document.createElement('td');
+                  var stopColumn = document.createElement('td');
+                  var naptanColumn = document.createElement('td');
+                  var nameColumn = document.createElement('td');
+                  // var landmarkColumn = document.createElement('td');
+                  // var streetColumn = document.createElement('td');
+                  // var crossingColumn = document.createElement('td');
+                  var localityColumn = document.createElement('td');
+                  // var townColumn = document.createElement('td');
+                  // var suburbColumn = document.createElement('td');
+                  var indicatorColumn = document.createElement('td');
+                  var compassColumn = document.createElement('td');
+                  var distanceColumn = document.createElement('td');
+                  var dirColumn = document.createElement('td');
+                  var timingColumn = document.createElement('td');
+
+                  seqColumn.textContent = j + 1;
+                  stopColumn.textContent = stop;
+                  distanceColumn.textContent = route.distance[j];
+                  dirColumn.textContent = route.direction[j];
+
+                  if (!stopsTndsOnly.includes(stop)) {
+                    fetch(`${baseUrl}/data/naptan/stopPoints/${stop}.json`)
+                      .then(response => response.json())
+                      .then(point => {
+                        naptanColumn.textContent = point[stop] ? point[stop].naptanCode : '';
+                        nameColumn.textContent = point[stop] ? point[stop].name : '';
+                        // landmarkColumn.textContent = point[stop] ? point[stop].landmark : '';
+                        // streetColumn.textContent = point[stop] ? point[stop].street : '';
+                        // crossingColumn.textContent = point[stop] ? point[stop].crossing : '';
+                        localityColumn.textContent = point[stop] ? point[stop].locality : '';
+                        // townColumn.textContent = point[stop] ? point[stop].town : '';
+                        // suburbColumn.textContent = point[stop] ? point[stop].suburb : '';
+                        indicatorColumn.textContent = point[stop] ? point[stop].indicator : '';
+                        compassColumn.textContent = point[stop] ? point[stop].properties.bearing : '';
+                        timingColumn.textContent = point[stop] ? point[stop].properties.timingStatus : '';
+
+                        stopsGeo.features.push({
+                          'type': 'Feature',
+                          'geometry': {
+                            'type': 'Point',
+                            'coordinates': point[stop].coordinates
+                          },
+                          'properties': {
+                            'seq': j + 1,
+                            'id': stop,
+                            'name': point[stop] ? point[stop].name : ''
+                          }
+                        });
+                    });
+                  } else {
+                    fetch(`${baseUrl}/data/tnds/stopPoints/${stop}.json`)
+                      .then(response => response.json())
+                      .then(point => {
+                        nameColumn.textContent = point[stop] ? point[stop].name : '';
+                      });
                   }
+
+                  row.appendChild(seqColumn);
+                  row.appendChild(stopColumn);
+                  row.appendChild(naptanColumn);
+                  row.appendChild(nameColumn);
+                  // row.appendChild(landmarkColumn);
+                  // row.appendChild(streetColumn);
+                  // row.appendChild(crossingColumn);
+                  row.appendChild(localityColumn);
+                  // row.appendChild(townColumn);
+                  // row.appendChild(suburbColumn);
+                  row.appendChild(indicatorColumn);
+                  row.appendChild(compassColumn);
+                  row.appendChild(timingColumn);
+                  row.appendChild(distanceColumn);
+                  row.appendChild(dirColumn);
+                  routeTable.appendChild(row);
+                });
+                
+                document.getElementById('details').appendChild(routeTable);
+                // document.getElementById('details').appendChild(document.createElement('br'));
+
+                var routeMap = document.createElement('div');
+                routeMap.id = `map-${i}`;
+                routeMap.classList.add('map');
+                document.getElementById('details').appendChild(routeMap);
+
+                var map = new mapboxgl.Map({
+                  container: `map-${i}`,
+                  style: 'mapbox://styles/mapbox/light-v11',
+                  center: [-2.89479, 54.093409],
+                  zoom: 4,
+                  trackResize: true
                 });
 
-                map.addLayer({
-                  'id': 'markers',
-                  'type': 'symbol',
-                  'source': 'stops',
-                  'layout': {
-                    'icon-image': 'bus',
-                    'text-variable-anchor': ['right', 'left', 'top-right', 'top-left', 'bottom-right', 'bottom-left'],
-                    'text-justify': 'auto',
-                    'text-size': 11,
-                    'text-radial-offset': 0.5,
-                    'text-optional': false,
-                    'text-field': ['concat', ['get', 'seq'], ['string', '. '], ['get', 'name']]
-                  },
-                  'paint': {
-                    'text-halo-color': '#fff',
-                    'text-halo-width': 1,
-                    'text-halo-blur': 1
-                  }
-                });
+                map.on('load', () => {
+                  var bounds = new mapboxgl.LngLatBounds();
 
-                trackGeo.geometry.coordinates.forEach((coords, i) => {
-                  bounds.extend(coords);
-                });
+                  map.addSource('tracks', {
+                    'type': 'geojson',
+                    'data': trackGeo
+                  });
 
-                stopsGeo.features.forEach((feature) => {
-                  bounds.extend(feature.geometry.coordinates);
-                });
+                  map.addSource('stops', {
+                    'type': 'geojson',
+                    'data': stopsGeo
+                  });
 
-                map.fitBounds(bounds, {
-                  "linear": true,
-                  "padding": 75
+                  map.addLayer({
+                    'id': 'lines',
+                    'type': 'line',
+                    'source': 'tracks',
+                    'layout': {
+                      'line-join': 'round',
+                      'line-cap': 'round'
+                    },
+                    'paint': {
+                      'line-color': '#999',
+                      'line-width': 2
+                    }
+                  });
+
+                  map.addLayer({
+                    'id': 'markers',
+                    'type': 'symbol',
+                    'source': 'stops',
+                    'layout': {
+                      'icon-image': 'bus',
+                      'text-variable-anchor': ['right', 'left', 'top-right', 'top-left', 'bottom-right', 'bottom-left'],
+                      'text-justify': 'auto',
+                      'text-size': 11,
+                      'text-radial-offset': 0.5,
+                      'text-optional': false,
+                      'text-field': ['concat', ['get', 'seq'], ['string', '. '], ['get', 'name']]
+                    },
+                    'paint': {
+                      'text-halo-color': '#fff',
+                      'text-halo-width': 1,
+                      'text-halo-blur': 1
+                    }
+                  });
+
+                  trackGeo.geometry.coordinates.forEach((coords, i) => {
+                    bounds.extend(coords);
+                  });
+
+                  stopsGeo.features.forEach((feature) => {
+                    bounds.extend(feature.geometry.coordinates);
+                  });
+
+                  map.fitBounds(bounds, {
+                    "linear": true,
+                    "padding": 75
+                  });
                 });
-              });
             });
           });
         });
