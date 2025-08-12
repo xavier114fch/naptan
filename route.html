@@ -136,7 +136,7 @@
         .then(response => response.json())
         .then(stopsTndsOnly => {
 
-        fetch(`data/tnds/${filename}`)
+        fetch(`${baseUrl}/data/tnds/${filename}`)
         .then(response => response.json())
         .then(details => {
           details = details[slug];
