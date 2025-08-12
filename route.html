@@ -197,8 +197,9 @@
                 serviceOption.value = `${route.routeId}`;
                 serviceOption.innerHTML = `${route.description} (${route.routeId})`;
                 document.getElementById('routes').appendChild(serviceOption);
-                
+
                 var routeContent = document.createElement('section');
+                routeContent.id = `${route.routeId}`;
                 routeContent.innerHTML = `<h4>${route.description} (${route.routeId})</h4>`;
                 document.getElementById('details').appendChild(routeContent);
                 
