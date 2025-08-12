@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>JSON File Loader</title>
+  <!-- <script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css" />
+  <script src=" https://cdn.jsdelivr.net/npm/geojson/geojson.min.js "></script> -->
+  <style>
+  body {
+    font-size: .8rem;
+    font-family: monospace;
+  }
+
+  table, tr, th, td {
+    border: 1px solid #000;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  th, td {
+    vertical-align: top;
+    padding: .25em;
+  }
+
+  .map {
+    width: 90%;
+    height: 80vh;
+    margin: .8rem 0;
+  }
+  </style>
+</head>
+<body>  
+  <label for="number">Route Number: </label>
+  <input type="text" id="number" maxlength="100">
+  
+  <button onclick="getRoutes(document.getElementById('number').value)">Get Routes</button>
+
+  <hr>
+  <div id="details"></div>
+
+  <script>
+    const baseUrl = 'https://github.com/xavier114fch/naptan/raw/gh-pages';
+
+    document.addEventListener('keydown', (e) => {
+      if (event.key === 'h' || event.key === 'H') {
+        window.scrollTo({
+          top: 0, 
+          behavior: 'smooth'
+        });
+      }
+    });
+
+    function getRoutes(number) {
+      document.getElementById('details').innerHTML = '';
+
+      fetch(`${baseUrl}/data/tnds/all_slugs.json`)
+        .then(response => response.json())
+        .then(slugs => {
+
+          var routeTable = document.createElement('table');
+          var row = document.createElement('tr');
+          row.innerHTML = '<th>Slug</th>';
+          row.innerHTML += '<th>Name</th>';
+          row.innerHTML += '<th>Description</th>';
+          row.innerHTML += '<th>Operator</th>';
+          row.innerHTML += '<th>Mode</th>'
+          row.innerHTML += '<th>Start Date</th>';
+          row.innerHTML += '<th>End Date</th>';
+          row.innerHTML += '<th>Last Modified</th>';
+          row.innerHTML += '<th>Path</th>';
+          routeTable.appendChild(row);
+
+          for (var slug in slugs) {
+            var routes = [];
+
+            if (/\+/.test(slug))
+              routes = slug.split('-')[0].toUpperCase().split('+');
+
+            else
+              routes.push(slug.split('-')[0].toUpperCase());
+
+            routes.forEach((route) => {
+              if (route.startsWith(number.toUpperCase())) {
+                var details = slugs[slug];
+
+                details.forEach((detail) => {
+                  row = document.createElement('tr');
+                  var slugColumn = document.createElement('td');
+                  var pathColumn = document.createElement('td');
+                  var nameColumn = document.createElement('td');
+                  var descColumn = document.createElement('td');
+                  var operatorColumn = document.createElement('td');
+                  var modeColumn = document.createElement('td');
+                  var startColumn = document.createElement('td');
+                  var endColumn = document.createElement('td');
+                  var lastModifiedColumn = document.createElement('td');
+
+                  var filename = '';
+                  if (detail.region == 'NCSD')
+                    filename = `${baseUrl}/data/tnds/${detail.region}/${detail.region}_TXC/${detail.filename}`;
+
+                  else
+                    filename = `${baseUrl}/data/tnds/${detail.region}/${detail.filename}`;
+
+                  slugColumn.textContent = slug;
+                  pathColumn.innerHTML = `<a href='#' onclick='getDetails("${slug}", "${filename}");'>${filename}</a>`;
+                  nameColumn.textContent = detail.name;
+                  descColumn.textContent = detail.description;
+                  operatorColumn.textContent = detail.operators;
+                  modeColumn.textContent = detail.mode;
+                  startColumn.textContent = detail.startDate;
+                  endColumn.textContent = detail.endDate;
+                  lastModifiedColumn.textContent = detail.lastModified;
+
+                  row.appendChild(slugColumn);
+                  row.appendChild(nameColumn);
+                  row.appendChild(descColumn);
+                  row.appendChild(operatorColumn);
+                  row.appendChild(modeColumn);
+                  row.appendChild(startColumn);
+                  row.appendChild(endColumn);
+                  row.appendChild(lastModifiedColumn);
+                  row.appendChild(pathColumn);
+                  routeTable.appendChild(row);
+                });
+              }
+            });
+          }
+
+          document.getElementById('details').appendChild(routeTable);
+        });
+    }
+
+    function getDetails(slug, filename) {
+      event.preventDefault();
+
+      fetch(`${baseUrl}/data/tnds/${filename}`)
+        .then(response => response.json())
+        .then(details => {
+          details = details[slug];
+
+          document.getElementById('details').innerHTML = '';
+          details.forEach((detail) => {
+            var meta = document.createElement('section');
+            meta.id = 'meta';
+
+            var metaContent = '';
+            if (detail.region == 'NCSD')
+              metaContent = `<p>${detail.mode.toUpperCase()} / ${detail.region} / ${detail.region}_TXC / ${detail.filename}`;
+
+            else
+              metaContent = `<p>${detail.mode.toUpperCase()} / ${detail.region} / ${detail.filename}`;
+
+            metaContent += `<br><h2>${detail.name} ${detail.origin} &gt; ${detail.destination}</h2>`;
+
+            if (detail.vias.length > 0)
+              metaContent += `<br>via: ${detail.vias}`;
+
+            metaContent += `<br>${detail.description}`;
+            metaContent += `<br>Operator(s): ${detail.operators}`;
+            metaContent += `<br>Mode: ${detail.mode}`;
+            metaContent += `<br>Valid from: ${detail.startDate} &gt; ${detail.endDate}`;
+            metaContent += `<br>Last modified: ${detail.lastModified}`;
+            metaContent += '</p>';
+
+            meta.innerHTML = metaContent;
+            document.getElementById('details').appendChild(meta);
+
+            if (document.getElementById('details').contains(document.getElementById('routes')) == false) {
+              var serviceLabel = document.createElement('label');
+              serviceLabel.for = 'routes';
+              serviceLabel.textContent = 'Routes: ';
+
+              var serviceSelect = document.createElement('select');
+              serviceSelect.id = 'routes';
+
+              serviceSelect.addEventListener('change', (e) => {
+                var selectedValue = e.target.value;
+
+                if (selectedValue !== "") {
+                  var targetAnchor = document.getElementById(selectedValue);
+                  if (targetAnchor) {
+                    targetAnchor.scrollIntoView({
+                      behavior: 'smooth'
+                    });
+                  }
+                }
+              });
+            }
+
+            document.getElementById('details').appendChild(serviceLabel);
+            document.getElementById('details').appendChild(serviceSelect);
+
+            fetch(`${baseUrl}/data/tnds/stops_tnds_only.json`)
+              .then(response => response.json())
+              .then(stopsTndsOnly => {
+
+              var timetables = detail.timetables;
+              for (let routeId in timetables) {
+                var routes = detail.routes;
+                routes.forEach((route, i) => {
+                  if (routeId == route.routeId) {
+                    var serviceOption = document.createElement('option');
+                    serviceOption.value = `${route.routeId}`;
+                    serviceOption.innerHTML = `${route.description} (${route.routeId})`;
+                    document.getElementById('routes').appendChild(serviceOption);
+
+                    document.getElementById('details').appendChild(document.createElement('hr'));
+
+                    var routeContent = document.createElement('section');
+                    routeContent.id = `${route.routeId}`;
+                    routeContent.innerHTML = `<h3>${route.description} (${route.routeId})</h3>`;
+                    document.getElementById('details').appendChild(routeContent);
+
+                    timetables[routeId].forEach((timetable, j) => {
+                      var schedules = timetable.schedules;
+                      schedules.forEach((schedule, k) => {
+                        var timetableContent = document.createElement('section');
+                        var regular = schedule.profiles.regular.flat().join(', ');
+                        var holidaysRunning, holidaysNotRunning;
+                        var specialRunning = '', specialNotRunning = '';
+
+                        if (schedule.profiles.hasOwnProperty('holidays')) {
+                          if (schedule.profiles.holidays.hasOwnProperty('running'))
+                            holidaysRunning = schedule.profiles.holidays.running.flat().join(', ');
+
+                          if (schedule.profiles.holidays.hasOwnProperty('notRunning'))
+                            holidaysNotRunning = schedule.profiles.holidays.notRunning.flat().join(', ');
+                        }
+
+                        if (schedule.profiles.hasOwnProperty('special')) {
+                          if (schedule.profiles.special.hasOwnProperty('running')) {
+                            schedule.profiles.special.running.forEach((run, m) => {
+                              specialRunning += (run.startDate != run.endDate) ? `${run.startDate}-${run.endDate}` : `${run.startDate}`;
+                              specialRunning += (m < schedule.profiles.special.running.length - 1) ? ',' : '';
+                            });
+                          }
+
+                          if (schedule.profiles.special.hasOwnProperty('notRunning')) {
+                            schedule.profiles.special.notRunning.forEach((run, m) => {
+                              specialNotRunning += (run.startDate != run.endDate) ? `${run.startDate}-${run.endDate}` : `${run.startDate}`;
+                              specialNotRunning += (m < schedule.profiles.special.notRunning.length - 1) ? ', ' : '';
+                            });
+                          }
+                        }
+
+                        timetableContent.innerHTML = `<p><b>Running at these times</b>`;
+                        timetableContent.innerHTML += `Regular: ${regular}<br>`;
+                        timetableContent.innerHTML += holidaysRunning ? `Holidays: ${holidaysRunning}<br>` : '';
+                        timetableContent.innerHTML += (specialRunning != '') ? `Special: ${specialRunning}<br>` : '';
+                        timetableContent.innerHTML += `</p>`;
+
+                        if (holidaysNotRunning || specialNotRunning != '') {
+                          timetableContent.innerHTML += `<p><b>Not Running at these times</b>`;
+                          timetableContent.innerHTML += holidaysNotRunning ? `Holidays: ${holidaysNotRunning}<br>` : '';
+                          timetableContent.innerHTML += (specialNotRunning != '') ? `Special: ${specialNotRunning}<br>` : '';
+                          timetableContent.innerHTML += `</p>`;
+                        }
+
+                        document.getElementById('details').appendChild(timetableContent);
+
+                        var routeTable = document.createElement('table');
+                        var row = document.createElement('tr');
+                        row.innerHTML += '<th>#</th>';
+                        row.innerHTML += '<th>ATCO</th>';
+                        row.innerHTML += '<th>Naptan</th>';
+                        row.innerHTML += '<th>Name</th>';
+                        // row.innerHTML += '<th>Landmark</th>';
+                        // row.innerHTML += '<th>Street</th>';
+                        // row.innerHTML += '<th>Crossing</th>';
+                        row.innerHTML += '<th>Locality</th>';
+                        // row.innerHTML += '<th>Town</th>';
+                        // row.innerHTML += '<th>Suburb</th>';
+                        row.innerHTML += '<th>Indicator</th>';
+                        row.innerHTML += '<th>Compass</th>';
+                        row.innerHTML += '<th>Timing Status</th>';
+                        row.innerHTML += '<th>Distance</th>';
+                        row.innerHTML += '<th>Bound</th>';
+                        // row.innerHTML += '<th>WaitTime</th>';
+                        row.innerHTML += '<th>Runtime</th>';
+                        
+                        // schedules.forEach((schedule, k) => {
+                          schedule.departures.forEach((departure, m) => {
+                            row.innerHTML += '<th></th>';
+                          });
+                        // });
+
+                        routeTable.appendChild(row);
+
+                        timetable.stopPoints.forEach((stop, l) => {
+                          row = document.createElement('tr');
+                          var seqColumn = document.createElement('td');
+                          var stopColumn = document.createElement('td');
+                          var naptanColumn = document.createElement('td');
+                          var nameColumn = document.createElement('td');
+                          // var landmarkColumn = document.createElement('td');
+                          // var streetColumn = document.createElement('td');
+                          // var crossingColumn = document.createElement('td');
+                          var localityColumn = document.createElement('td');
+                          // var townColumn = document.createElement('td');
+                          // var suburbColumn = document.createElement('td');
+                          var indicatorColumn = document.createElement('td');
+                          var compassColumn = document.createElement('td');
+                          var distanceColumn = document.createElement('td');
+                          var dirColumn = document.createElement('td');
+                          var timingColumn = document.createElement('td');
+                          var runtimeColumn = document.createElement('td');
+                          // var waitTimeColumn = document.createElement('td');
+
+                          seqColumn.textContent = l + 1;
+                          stopColumn.textContent = stop;
+
+                          if (!stopsTndsOnly.includes(stop)) {
+                            fetch(`${baseUrl}/data/naptan/stopPoints/${stop}.json`)
+                              .then(response => response.json())
+                              .then(point => {
+                                naptanColumn.textContent = point[stop] ? point[stop].naptanCode : '';
+                                nameColumn.textContent = point[stop] ? point[stop].name : '';
+                                // landmarkColumn.textContent = point[stop] ? point[stop].landmark : '';
+                                // streetColumn.textContent = point[stop] ? point[stop].street : '';
+                                // crossingColumn.textContent = point[stop] ? point[stop].crossing : '';
+                                localityColumn.textContent = point[stop] ? point[stop].locality : '';
+                                // townColumn.textContent = point[stop] ? point[stop].town : '';
+                                // suburbColumn.textContent = point[stop] ? point[stop].suburb : '';
+                                indicatorColumn.textContent = point[stop] ? point[stop].indicator : '';
+                                compassColumn.textContent = point[stop] ? point[stop].properties.bearing : '';
+                              });
+                          } else {
+                            fetch(`${baseUrl}/data/tnds/stopPoints/${stop}.json`)
+                              .then(response => response.json())
+                              .then(point => {
+                                nameColumn.textContent = point[stop] ? point[stop].name : '';
+                              });
+                          }
+
+                          timingColumn.textContent = timetable.timingStatuses[l];
+                          distanceColumn.textContent = route.distance[l];
+                          dirColumn.textContent = route.direction[l];
+
+                          runtimeColumn.innerHTML = '';
+                          if (timetable.waitTimes[l] != '')
+                            runtimeColumn.innerHTML += `<i>${timetable.waitTimes[l]}</i><br>`;
+                          runtimeColumn.innerHTML += timetable.runtimes[l] ? timetable.runtimes[l] : '';
+
+                          // waitTimeColumn.textContent = timetable.waitTimes[l];
+
+                          row.appendChild(seqColumn);
+                          row.appendChild(stopColumn);
+                          row.appendChild(naptanColumn);
+                          row.appendChild(nameColumn);
+                          // row.appendChild(landmarkColumn);
+                          // row.appendChild(streetColumn);
+                          // row.appendChild(crossingColumn);
+                          row.appendChild(localityColumn);
+                          // row.appendChild(townColumn);
+                          // row.appendChild(suburbColumn);
+                          row.appendChild(indicatorColumn);
+                          row.appendChild(compassColumn);
+                          row.appendChild(timingColumn);
+                          row.appendChild(distanceColumn);
+                          row.appendChild(dirColumn);
+                          // row.appendChild(waitTimeColumn);
+                          row.appendChild(runtimeColumn);
+
+                          schedule.departures.forEach((departure, m) => {
+                            var departureColumn = document.createElement('td');
+                            var dayShift = schedule.dayShift[m] == 1 ? '*' : '';
+                            var waittime;
+
+                            if (l == 0) {
+                              departureColumn.innerHTML = `${departure}${dayShift}`;
+                              waittime = timetable.waitTimes[l];
+
+                              if (waittime != '') {
+                                [hours, minutes, seconds] = departure.split(':').map(Number);
+                                match = waittime.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+                                hoursToAdd = match[1] ? parseInt(match[1]) : 0;
+                                minutesToAdd = match[2] ? parseInt(match[2]) : 0;
+                                secondsToAdd = match[3] ? parseInt(match[3]) : 0;
+                                totalSeconds = hours * 3600 + hoursToAdd * 3600 + minutes * 60 + minutesToAdd * 60 + seconds + secondsToAdd;
+                                
+                                newHours = Math.floor(totalSeconds / 3600);
+                                if (newHours > 23) {
+                                  newHours -= 24;
+                                  dayShift = '*';
+                                }
+                                newMinutes = Math.floor((totalSeconds % 3600) / 60);
+                                newSeconds = totalSeconds % 60;
+                                departure = [newHours, newMinutes, newSeconds].map(num => String(num).padStart(2, '0')).join(':');
+
+                                departureColumn.innerHTML += `<br>${departure}${dayShift}`;
+                              }
+                            }
+
+                            else {
+                              for (n = 0; n <= l - 1; n++) {
+                                departureColumn.innerHTML = '';
+
+                                var [hours, minutes, seconds] = departure.split(':').map(Number);
+                                var runtime = timetable.runtimes[n];
+                                var match = runtime.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+                                var hoursToAdd = match[1] ? parseInt(match[1]) : 0;
+                                var minutesToAdd = match[2] ? parseInt(match[2]) : 0;
+                                var secondsToAdd = match[3] ? parseInt(match[3]) : 0;
+                                var totalSeconds = hours * 3600 + hoursToAdd * 3600 + minutes * 60 + minutesToAdd * 60 + seconds + secondsToAdd;
+
+                                var newHours = Math.floor(totalSeconds / 3600);
+                                if (newHours > 23) {
+                                  newHours -= 24;
+                                  dayShift = '*';
+                                }
+                                var newMinutes = Math.floor((totalSeconds % 3600) / 60);
+                                var newSeconds = totalSeconds % 60;
+                                departure = [newHours, newMinutes, newSeconds].map(num => String(num).padStart(2, '0')).join(':');
+
+                                departureColumn.innerHTML += `${departure}${dayShift}`;
+                                waittime = timetable.waitTimes[n + 1];
+
+                                if (waittime != '') {
+                                  [hours, minutes, seconds] = departure.split(':').map(Number);
+                                  match = waittime.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+                                  hoursToAdd = match[1] ? parseInt(match[1]) : 0;
+                                  minutesToAdd = match[2] ? parseInt(match[2]) : 0;
+                                  secondsToAdd = match[3] ? parseInt(match[3]) : 0;
+                                  totalSeconds = hours * 3600 + hoursToAdd * 3600 + minutes * 60 + minutesToAdd * 60 + seconds + secondsToAdd;
+                                  
+                                  newHours = Math.floor(totalSeconds / 3600);
+                                  if (newHours > 23) {
+                                    newHours -= 24;
+                                    dayShift = '*';
+                                  }
+                                  newMinutes = Math.floor((totalSeconds % 3600) / 60);
+                                  newSeconds = totalSeconds % 60;
+                                  departure = [newHours, newMinutes, newSeconds].map(num => String(num).padStart(2, '0')).join(':');
+
+                                  departureColumn.innerHTML += `<br>${departure}${dayShift}`;
+                                }
+                              }
+                            }
+
+                            row.appendChild(departureColumn);
+                          });
+
+                          routeTable.appendChild(row);
+                        });
+
+                        document.getElementById('details').appendChild(routeTable);
+                        document.getElementById('details').appendChild(document.createElement('br'));
+                      });
+                    });
+                  }
+                });
+              }
+            });
+          });
+        });
+    }
+  </script>
+</body>
+</html>
