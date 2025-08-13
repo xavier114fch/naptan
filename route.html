@@ -279,17 +279,17 @@
                       distanceColumn.textContent = route.distance[j];
                       dirColumn.textContent = route.direction[j];
 
-                      naptanColumn.textContent = stopStore[stop] ? stopStore[stop].naptanCode : '';
-                      nameColumn.textContent = stopStore[stop] ? stopStore[stop].name : '';
-                      // landmarkColumn.textContent = stopStore[stop] ? stopStore[stop].landmark : '';
-                      // streetColumn.textContent = stopStore[stop] ? stopStore[stop].street : '';
-                      // crossingColumn.textContent = stopStore[stop] ? stopStore[stop].crossing : '';
-                      localityColumn.textContent = stopStore[stop] ? stopStore[stop].locality : '';
-                      // townColumn.textContent = stopStore[stop] ? stopStore[stop].town : '';
-                      // suburbColumn.textContent = stopStore[stop] ? stopStore[stop].suburb : '';
-                      indicatorColumn.textContent = stopStore[stop] ? stopStore[stop].indicator : '';
-                      compassColumn.textContent = stopStore[stop] ? stopStore[stop].properties.bearing : '';
-                      timingColumn.textContent = stopStore[stop] ? stopStore[stop].properties.timingStatus : '';
+                      naptanColumn.textContent = stopStore[stop].naptanCode ? stopStore[stop].naptanCode : '';
+                      nameColumn.textContent = stopStore[stop].name ? stopStore[stop].name : '';
+                      // landmarkColumn.textContent = stopStore[stop].landmark ? stopStore[stop].landmark : '';
+                      // streetColumn.textContent = stopStore[stop].street ? stopStore[stop].street : '';
+                      // crossingColumn.textContent = stopStore[stop].crossin ? stopStore[stop].crossing : '';
+                      localityColumn.textContent = stopStore[stop].locality ? stopStore[stop].locality : '';
+                      // townColumn.textContent = stopStore[stop].town ? stopStore[stop].town : '';
+                      // suburbColumn.textContent = stopStore[stop].suburb ? stopStore[stop].suburb : '';
+                      indicatorColumn.textContent = stopStore[stop].indicator ? stopStore[stop].indicator : '';
+                      compassColumn.textContent = stopStore[stop].properties && stopStore[stop].properties.bearing ? stopStore[stop].properties.bearing : '';
+                      timingColumn.textContent = stopStore[stop].properties && stopStore[stop].properties.timingStatus ? stopStore[stop].properties.timingStatus : '';
 
                       stopsGeo.features.push({
                         'type': 'Feature',

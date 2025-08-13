@@ -346,7 +346,7 @@
                               // townColumn.textContent = stopStore[stop].town ? stopStore[stop].town : '';
                               // suburbColumn.textContent = stopStore[stop].suburb ? stopStore[stop].suburb : '';
                               indicatorColumn.textContent = stopStore[stop].indicator ? stopStore[stop].indicator : '';
-                              compassColumn.textContent = stopStore[stop].properties.bearing ? stopStore[stop].properties.bearing : '';
+                              compassColumn.textContent = stopStore[stop].properties && stopStore[stop].properties.bearing ? stopStore[stop].properties.bearing : '';
 
                               timingColumn.textContent = timetable.timingStatuses[l];
                               distanceColumn.textContent = route.distance[l];
