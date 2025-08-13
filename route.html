@@ -202,205 +202,205 @@
               .then(stopsTndsOnly => {
 
                 const promises = stopList.map(stop => {
-                    const url = stopsTndsOnly.includes(stop)
-                      ? `${baseUrl}/data/tnds/stopPoints/${stop}.json`
-                      : `${baseUrl}/data/naptan/stopPoints/${stop}.json`;
+                  const url = stopsTndsOnly.includes(stop)
+                    ? `${baseUrl}/data/tnds/stopPoints/${stop}.json`
+                    : `${baseUrl}/data/naptan/stopPoints/${stop}.json`;
 
-                    return fetch(url)
-                      .then(response => response.json())
-                      .then(s => stopStore[stop] = s[stop]);
-                  });
+                  return fetch(url)
+                    .then(response => response.json())
+                    .then(s => stopStore[stop] = s[stop]);
+                });
 
-                  Promise.all(promises).then(() => {
-                    detail.routes.forEach((route, i) => {
-                      var serviceOption = document.createElement('option');
-                      serviceOption.value = `${route.routeId}`;
-                      serviceOption.innerHTML = `${route.description} (${route.routeId})`;
-                      document.getElementById('routes').appendChild(serviceOption);
+                Promise.all(promises).then(() => {
+                  detail.routes.forEach((route, i) => {
+                    var serviceOption = document.createElement('option');
+                    serviceOption.value = `${route.routeId}`;
+                    serviceOption.innerHTML = `${route.description} (${route.routeId})`;
+                    document.getElementById('routes').appendChild(serviceOption);
 
-                      var routeContent = document.createElement('section');
-                      routeContent.id = `${route.routeId}`;
-                      routeContent.innerHTML = `<h4>${route.description} (${route.routeId})</h4>`;
-                      document.getElementById('details').appendChild(routeContent);
-                      
-                      var routeTable = document.createElement('table');
-                      var row = document.createElement('tr');
-                      row.innerHTML += '<th>#</th>';
-                      row.innerHTML += '<th>ATCO</th>';
-                      row.innerHTML += '<th>Naptan</th>';
-                      row.innerHTML += '<th>Name</th>';
-                      // row.innerHTML += '<th>Landmark</th>';
-                      // row.innerHTML += '<th>Street</th>';
-                      // row.innerHTML += '<th>Crossing</th>';
-                      row.innerHTML += '<th>Locality</th>';
-                      // row.innerHTML += '<th>Town</th>';
-                      // row.innerHTML += '<th>Suburb</th>';
-                      row.innerHTML += '<th>Indicator</th>';
-                      row.innerHTML += '<th>Compass</th>';
-                      row.innerHTML += '<th>Timing Status</th>';
-                      row.innerHTML += '<th>Distance</th>';
-                      row.innerHTML += '<th>Bound</th>';
-                      routeTable.appendChild(row);
+                    var routeContent = document.createElement('section');
+                    routeContent.id = `${route.routeId}`;
+                    routeContent.innerHTML = `<h4>${route.description} (${route.routeId})</h4>`;
+                    document.getElementById('details').appendChild(routeContent);
+                    
+                    var routeTable = document.createElement('table');
+                    var row = document.createElement('tr');
+                    row.innerHTML += '<th>#</th>';
+                    row.innerHTML += '<th>ATCO</th>';
+                    row.innerHTML += '<th>Naptan</th>';
+                    row.innerHTML += '<th>Name</th>';
+                    // row.innerHTML += '<th>Landmark</th>';
+                    // row.innerHTML += '<th>Street</th>';
+                    // row.innerHTML += '<th>Crossing</th>';
+                    row.innerHTML += '<th>Locality</th>';
+                    // row.innerHTML += '<th>Town</th>';
+                    // row.innerHTML += '<th>Suburb</th>';
+                    row.innerHTML += '<th>Indicator</th>';
+                    row.innerHTML += '<th>Compass</th>';
+                    row.innerHTML += '<th>Timing Status</th>';
+                    row.innerHTML += '<th>Distance</th>';
+                    row.innerHTML += '<th>Bound</th>';
+                    routeTable.appendChild(row);
 
-                      var stopsGeo = {
-                        'type': 'FeatureCollection',
-                        'features': []
-                      };
+                    var stopsGeo = {
+                      'type': 'FeatureCollection',
+                      'features': []
+                    };
 
-                      var trackGeo = {
+                    var trackGeo = {
+                      'type': 'Feature',
+                      'geometry': {
+                        type: 'LineString',
+                        coordinates: route.tracks
+                      },
+                      'properties': {}
+                    };
+
+                    route.stopPoints.forEach((stop, j) => {
+                      row = document.createElement('tr');
+                      var seqColumn = document.createElement('td');
+                      var stopColumn = document.createElement('td');
+                      var naptanColumn = document.createElement('td');
+                      var nameColumn = document.createElement('td');
+                      // var landmarkColumn = document.createElement('td');
+                      // var streetColumn = document.createElement('td');
+                      // var crossingColumn = document.createElement('td');
+                      var localityColumn = document.createElement('td');
+                      // var townColumn = document.createElement('td');
+                      // var suburbColumn = document.createElement('td');
+                      var indicatorColumn = document.createElement('td');
+                      var compassColumn = document.createElement('td');
+                      var distanceColumn = document.createElement('td');
+                      var dirColumn = document.createElement('td');
+                      var timingColumn = document.createElement('td');
+
+                      seqColumn.textContent = j + 1;
+                      stopColumn.textContent = stop;
+                      distanceColumn.textContent = route.distance[j];
+                      dirColumn.textContent = route.direction[j];
+
+                      naptanColumn.textContent = stopStore[stop] ? stopStore[stop].naptanCode : '';
+                      nameColumn.textContent = stopStore[stop] ? stopStore[stop].name : '';
+                      // landmarkColumn.textContent = stopStore[stop] ? stopStore[stop].landmark : '';
+                      // streetColumn.textContent = stopStore[stop] ? stopStore[stop].street : '';
+                      // crossingColumn.textContent = stopStore[stop] ? stopStore[stop].crossing : '';
+                      localityColumn.textContent = stopStore[stop] ? stopStore[stop].locality : '';
+                      // townColumn.textContent = stopStore[stop] ? stopStore[stop].town : '';
+                      // suburbColumn.textContent = stopStore[stop] ? stopStore[stop].suburb : '';
+                      indicatorColumn.textContent = stopStore[stop] ? stopStore[stop].indicator : '';
+                      compassColumn.textContent = stopStore[stop] ? stopStore[stop].properties.bearing : '';
+                      timingColumn.textContent = stopStore[stop] ? stopStore[stop].properties.timingStatus : '';
+
+                      stopsGeo.features.push({
                         'type': 'Feature',
                         'geometry': {
-                          type: 'LineString',
-                          coordinates: route.tracks
+                          'type': 'Point',
+                          'coordinates': stopStore[stop].coordinates
                         },
-                        'properties': {}
-                      };
-
-                      route.stopPoints.forEach((stop, j) => {
-                        row = document.createElement('tr');
-                        var seqColumn = document.createElement('td');
-                        var stopColumn = document.createElement('td');
-                        var naptanColumn = document.createElement('td');
-                        var nameColumn = document.createElement('td');
-                        // var landmarkColumn = document.createElement('td');
-                        // var streetColumn = document.createElement('td');
-                        // var crossingColumn = document.createElement('td');
-                        var localityColumn = document.createElement('td');
-                        // var townColumn = document.createElement('td');
-                        // var suburbColumn = document.createElement('td');
-                        var indicatorColumn = document.createElement('td');
-                        var compassColumn = document.createElement('td');
-                        var distanceColumn = document.createElement('td');
-                        var dirColumn = document.createElement('td');
-                        var timingColumn = document.createElement('td');
-
-                        seqColumn.textContent = j + 1;
-                        stopColumn.textContent = stop;
-                        distanceColumn.textContent = route.distance[j];
-                        dirColumn.textContent = route.direction[j];
-
-                        naptanColumn.textContent = stopStore[stop] ? stopStore[stop].naptanCode : '';
-                        nameColumn.textContent = stopStore[stop] ? stopStore[stop].name : '';
-                        // landmarkColumn.textContent = stopStore[stop] ? stopStore[stop].landmark : '';
-                        // streetColumn.textContent = stopStore[stop] ? stopStore[stop].street : '';
-                        // crossingColumn.textContent = stopStore[stop] ? stopStore[stop].crossing : '';
-                        localityColumn.textContent = stopStore[stop] ? stopStore[stop].locality : '';
-                        // townColumn.textContent = stopStore[stop] ? stopStore[stop].town : '';
-                        // suburbColumn.textContent = stopStore[stop] ? stopStore[stop].suburb : '';
-                        indicatorColumn.textContent = stopStore[stop] ? stopStore[stop].indicator : '';
-                        compassColumn.textContent = stopStore[stop] ? stopStore[stop].properties.bearing : '';
-                        timingColumn.textContent = stopStore[stop] ? stopStore[stop].properties.timingStatus : '';
-
-                        stopsGeo.features.push({
-                          'type': 'Feature',
-                          'geometry': {
-                            'type': 'Point',
-                            'coordinates': stopStore[stop].coordinates
-                          },
-                          'properties': {
-                            'seq': j + 1,
-                            'id': stop,
-                            'name': stopStore[stop] ? stopStore[stop].name : ''
-                          }
-                        });
-
-                        row.appendChild(seqColumn);
-                        row.appendChild(stopColumn);
-                        row.appendChild(naptanColumn);
-                        row.appendChild(nameColumn);
-                        // row.appendChild(landmarkColumn);
-                        // row.appendChild(streetColumn);
-                        // row.appendChild(crossingColumn);
-                        row.appendChild(localityColumn);
-                        // row.appendChild(townColumn);
-                        // row.appendChild(suburbColumn);
-                        row.appendChild(indicatorColumn);
-                        row.appendChild(compassColumn);
-                        row.appendChild(timingColumn);
-                        row.appendChild(distanceColumn);
-                        row.appendChild(dirColumn);
-                        routeTable.appendChild(row);
-                      });
-                      
-                      document.getElementById('details').appendChild(routeTable);
-                      // document.getElementById('details').appendChild(document.createElement('br'));
-
-                      var routeMap = document.createElement('div');
-                      routeMap.id = `map-${i}`;
-                      routeMap.classList.add('map');
-                      document.getElementById('details').appendChild(routeMap);
-
-                      var map = new mapboxgl.Map({
-                        container: `map-${i}`,
-                        style: 'mapbox://styles/mapbox/light-v11',
-                        center: [-2.89479, 54.093409],
-                        zoom: 4,
-                        trackResize: true
+                        'properties': {
+                          'seq': j + 1,
+                          'id': stop,
+                          'name': stopStore[stop] ? stopStore[stop].name : ''
+                        }
                       });
 
-                      map.on('load', () => {
-                        var bounds = new mapboxgl.LngLatBounds();
+                      row.appendChild(seqColumn);
+                      row.appendChild(stopColumn);
+                      row.appendChild(naptanColumn);
+                      row.appendChild(nameColumn);
+                      // row.appendChild(landmarkColumn);
+                      // row.appendChild(streetColumn);
+                      // row.appendChild(crossingColumn);
+                      row.appendChild(localityColumn);
+                      // row.appendChild(townColumn);
+                      // row.appendChild(suburbColumn);
+                      row.appendChild(indicatorColumn);
+                      row.appendChild(compassColumn);
+                      row.appendChild(timingColumn);
+                      row.appendChild(distanceColumn);
+                      row.appendChild(dirColumn);
+                      routeTable.appendChild(row);
+                    });
+                    
+                    document.getElementById('details').appendChild(routeTable);
+                    // document.getElementById('details').appendChild(document.createElement('br'));
 
-                        map.addSource('tracks', {
-                          'type': 'geojson',
-                          'data': trackGeo
-                        });
+                    var routeMap = document.createElement('div');
+                    routeMap.id = `map-${i}`;
+                    routeMap.classList.add('map');
+                    document.getElementById('details').appendChild(routeMap);
 
-                        map.addSource('stops', {
-                          'type': 'geojson',
-                          'data': stopsGeo
-                        });
-
-                        map.addLayer({
-                          'id': 'lines',
-                          'type': 'line',
-                          'source': 'tracks',
-                          'layout': {
-                            'line-join': 'round',
-                            'line-cap': 'round'
-                          },
-                          'paint': {
-                            'line-color': '#999',
-                            'line-width': 2
-                          }
-                        });
-
-                        map.addLayer({
-                          'id': 'markers',
-                          'type': 'symbol',
-                          'source': 'stops',
-                          'layout': {
-                            'icon-image': 'bus',
-                            'text-variable-anchor': ['right', 'left', 'top-right', 'top-left', 'bottom-right', 'bottom-left'],
-                            'text-justify': 'auto',
-                            'text-size': 11,
-                            'text-radial-offset': 0.5,
-                            'text-optional': false,
-                            'text-field': ['concat', ['get', 'seq'], ['string', '. '], ['get', 'name']]
-                          },
-                          'paint': {
-                            'text-halo-color': '#fff',
-                            'text-halo-width': 1,
-                            'text-halo-blur': 1
-                          }
-                        });
-
-                        trackGeo.geometry.coordinates.forEach((coords, i) => {
-                          bounds.extend(coords);
-                        });
-
-                        stopsGeo.features.forEach((feature) => {
-                          bounds.extend(feature.geometry.coordinates);
-                        });
-
-                        map.fitBounds(bounds, {
-                          "linear": true,
-                          "padding": 75
-                        });
-                      });
+                    var map = new mapboxgl.Map({
+                      container: `map-${i}`,
+                      style: 'mapbox://styles/mapbox/light-v11',
+                      center: [-2.89479, 54.093409],
+                      zoom: 4,
+                      trackResize: true
                     });
 
+                    map.on('load', () => {
+                      var bounds = new mapboxgl.LngLatBounds();
+
+                      map.addSource('tracks', {
+                        'type': 'geojson',
+                        'data': trackGeo
+                      });
+
+                      map.addSource('stops', {
+                        'type': 'geojson',
+                        'data': stopsGeo
+                      });
+
+                      map.addLayer({
+                        'id': 'lines',
+                        'type': 'line',
+                        'source': 'tracks',
+                        'layout': {
+                          'line-join': 'round',
+                          'line-cap': 'round'
+                        },
+                        'paint': {
+                          'line-color': '#999',
+                          'line-width': 2
+                        }
+                      });
+
+                      map.addLayer({
+                        'id': 'markers',
+                        'type': 'symbol',
+                        'source': 'stops',
+                        'layout': {
+                          'icon-image': 'bus',
+                          'text-variable-anchor': ['right', 'left', 'top-right', 'top-left', 'bottom-right', 'bottom-left'],
+                          'text-justify': 'auto',
+                          'text-size': 11,
+                          'text-radial-offset': 0.5,
+                          'text-optional': false,
+                          'text-field': ['concat', ['get', 'seq'], ['string', '. '], ['get', 'name']]
+                        },
+                        'paint': {
+                          'text-halo-color': '#fff',
+                          'text-halo-width': 1,
+                          'text-halo-blur': 1
+                        }
+                      });
+
+                      trackGeo.geometry.coordinates.forEach((coords, i) => {
+                        bounds.extend(coords);
+                      });
+
+                      stopsGeo.features.forEach((feature) => {
+                        bounds.extend(feature.geometry.coordinates);
+                      });
+
+                      map.fitBounds(bounds, {
+                        "linear": true,
+                        "padding": 75
+                      });
+                    });
                   });
+
+                });
             });
           });
       });
