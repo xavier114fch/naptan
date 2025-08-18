@@ -337,11 +337,14 @@ def outputTnds(_data_dir):
 								_journey_pattern_section_ref_list = [_journey_pattern_section_ref_list]
 
 							_jptl_ids = []
+							_jptl_routeLinks = []
 							_jptl_stops = []
 							_runtimes = []
 							_activities = []
 							_wait_times = []
 							_timing_statuses = []
+							_sequences = []
+							_display = []
 
 							for _i, _jpsf in enumerate(_journey_pattern_section_ref_list):
 								for _jps in _journey_pattern_section_list:
@@ -356,6 +359,7 @@ def outputTnds(_data_dir):
 
 										for _j, _jptl in enumerate(_journey_pattern_timing_link_list):
 											_jptl_id = _jptl.get('id')
+											_jptl_routeLinkRef = _jptl.get('RouteLinkRef')
 											_from_stop_point = _jptl.get('From', {}).get('StopPointRef')
 											_to_stop_point = _jptl.get('To', {}).get('StopPointRef')
 											_jptl_runtime = _jptl.get('RunTime')
@@ -365,6 +369,7 @@ def outputTnds(_data_dir):
 											# 	continue
 
 											_jptl_ids.append(_jptl_id)
+											_jptl_routeLinks.append(_jptl_routeLinkRef)
 											_runtimes.append(_jptl_runtime)
 
 											if _i == 0 and _j == 0:
@@ -372,6 +377,8 @@ def outputTnds(_data_dir):
 												_activities.append(_jptl.get('From', {}).get('Activity', 'pickUp'))
 												_wait_times.append(_jptl.get('From', {}).get('WaitTime', ''))
 												_timing_statuses.append(_jptl.get('From', {}).get('TimingStatus', ''))
+												_sequences.append(_jptl.get('From', {}).get('SequenceNumber', ''))
+												_display.append(_jptl.get('From', {}).get('DynamicDestinationDisplay', ''))
 
 											if _i == len(_journey_pattern_timing_link_list) - 1:
 												_activities.append('setDown')
@@ -382,13 +389,18 @@ def outputTnds(_data_dir):
 											_jptl_stops.append(_to_stop_point)
 											_timing_statuses.append(_jptl.get('To', {}).get('TimingStatus', ''))
 											_wait_times.append(_jptl.get('To', {}).get('WaitTime', ''))
+											_sequences.append(_jptl.get('To', {}).get('SequenceNumber', ''))
+											_display.append(_jptl.get('To', {}).get('DynamicDestinationDisplay', ''))
 
 							# _journey_pattern['journeyPatternTimingLinkIds'] = _jptl_ids
+							_journey_pattern.setdefault('routeLinkId', _jptl_routeLinks)
 							_journey_pattern.setdefault('stopPoints', _jptl_stops)
 							_journey_pattern.setdefault('runtimes', _runtimes)
 							_journey_pattern.setdefault('activities', _activities)
 							_journey_pattern.setdefault('waitTimes', _wait_times)
 							_journey_pattern.setdefault('timingStatuses', _timing_statuses)
+							_journey_pattern.setdefault('sequenceNumber', _sequences)
+							_journey_pattern.setdefault('dynamicDestinationDisplay', _display)
 
 							_vehicle_journey_list = _data.get('VehicleJourneys', {}).get('VehicleJourney', [])
 
@@ -628,7 +640,7 @@ def outputTnds(_data_dir):
 							for _route in _route_list:
 								_route_id = _route.get('id', '')
 								_route_section_ref = _route.get('RouteSectionRef', [])
-								_stop_points, _distance, _tracks, _direction = [], [], [], []
+								_route_link_ids, _stop_points, _distance, _tracks, _direction = [], [], [], [], []
 
 								if not isinstance(_route_section_ref, list):
 									_route_section_ref = [_route_section_ref]
@@ -654,6 +666,7 @@ def outputTnds(_data_dir):
 												_links.extend(_route_link)
 
 								for _link in _links:
+									_route_link_ids.append(_link.get('id', ''))
 									_stop_points.append(_link.get('From', {}).get('StopPointRef', ''))
 									_d = _link.get('Distance')
 									_distance.append(int(_d) if _d is not None else None)
@@ -675,15 +688,17 @@ def outputTnds(_data_dir):
 										else:
 											_lon = _track_location.get('Longitude', None)
 											_lat = _track_location.get('Latitude', None)
-
+											
 										if _lon and _lat:
 											_tracks.append([float(_lon), float(_lat)])
+
 
 								_link = _links[-1]
 								_stop_points.append(_link.get('To', {}).get('StopPointRef', ''))
 
 								_routes.append({
 									'routeId': _route_id,
+									'routeLinkIds': _route_link_ids,
 									# 'sectionRef': _route_section_ref,
 									'description': _route.get('Description', ''),
 									'stopPoints' : _stop_points,
