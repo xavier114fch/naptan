@@ -675,7 +675,7 @@ def outputTnds(_data_dir):
 									_track_locations = _link.get('Track', {}).get('Mapping', {}).get('Location', [])
 
 									if not _track_locations:
-										print(f'{_directory}/{_file}: Missing Track')
+										# print(f'{_directory}/{_file}: Missing Track')
 										continue
 
 									for _track_location in _track_locations:
