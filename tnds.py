@@ -708,7 +708,7 @@ def outputTnds(_data_dir):
 								})
 
 						elif _journey_pattern_list:
-							print(f'{_directory}/{_file} does not have <Route>.')
+							# print(f'{_directory}/{_file} does not have <Route>.')
 
 							if not isinstance(_journey_pattern_list, list):
 								_journey_pattern_list = [_journey_pattern_list]
