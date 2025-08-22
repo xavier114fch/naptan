@@ -589,6 +589,9 @@ def outputTnds(_data_dir):
 										_vjtl_list = [_vjtl_list]
 
 									for _vjtl in _vjtl_list:
+										if _vjtl is None:
+											continue
+										
 										_vtjl_jptlr = _vjtl.get('JourneyPatternTimingLinkRef', {})
 
 										if _vtjl_jptlr and _vtjl_jptlr in _jptl_ids:
