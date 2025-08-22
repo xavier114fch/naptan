@@ -595,11 +595,17 @@ def outputTnds(_data_dir):
 											_index = int(_jptl_ids.index(_vtjl_jptlr))
 
 											_from = _vjtl.get('From', {})
+											_from_activity = None
+											_from_wait_time = ''
+
 											if _from:
 												_from_activity = _vjtl.get('From', {}).get('Activity', {})
 												_from_wait_time = _vjtl.get('From', {}).get('WaitTime', '')
 
 											_to = _vjtl.get('To', {})
+											_to_activity = None
+											_to_wait_time = ''
+											
 											if _to:
 												_to_activity = _vjtl.get('To', {}).get('Activity', {})
 												_to_wait_time = _vjtl.get('To', {}).get('WaitTime', '')
