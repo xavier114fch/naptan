@@ -589,17 +589,21 @@ def outputTnds(_data_dir):
 										_vjtl_list = [_vjtl_list]
 
 									for _vjtl in _vjtl_list:
-										if _vjtl is None:
-											continue
-										
 										_vtjl_jptlr = _vjtl.get('JourneyPatternTimingLinkRef', {})
 
 										if _vtjl_jptlr and _vtjl_jptlr in _jptl_ids:
 											_index = int(_jptl_ids.index(_vtjl_jptlr))
-											_from_activity = _vjtl.get('From', {}).get('Activity', {})
-											_to_activity = _vjtl.get('To', {}).get('Activity', {})
-											_from_wait_time = _vjtl.get('From', {}).get('WaitTime', '')
-											_to_wait_time = _vjtl.get('To', {}).get('WaitTime', '')
+
+											_from = _vjtl.get('From', {})
+											if _from:
+												_from_activity = _vjtl.get('From', {}).get('Activity', {})
+												_from_wait_time = _vjtl.get('From', {}).get('WaitTime', '')
+
+											_to = _vjtl.get('To', {})
+											if _to:
+												_to_activity = _vjtl.get('To', {}).get('Activity', {})
+												_to_wait_time = _vjtl.get('To', {}).get('WaitTime', '')
+
 											_activities = _journey_pattern.get('activities', {})
 											_wait_times = _journey_pattern.get('waitTimes', {})
 
