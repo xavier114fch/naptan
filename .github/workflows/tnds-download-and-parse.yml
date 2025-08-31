@@ -41,7 +41,7 @@ jobs:
           TNDS_FTP_USER: ${{ secrets.TNDS_FTP_USER }}
           TNDS_FTP_PWD: ${{ secrets.TNDS_FTP_PWD }}
         run: |
-          python tnds.py
+          python -u tnds.py
 
       - name: Cleanup
         run: |

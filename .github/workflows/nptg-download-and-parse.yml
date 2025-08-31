@@ -27,7 +27,7 @@ jobs:
 
       - name: Fetch NPTG
         run: |
-          python nptg.py
+          python -u nptg.py
 
       - name: Cleanup
         run: |

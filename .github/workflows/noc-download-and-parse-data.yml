@@ -27,7 +27,7 @@ jobs:
 
       - name: Fetch NOC
         run: |
-          python noc.py
+          python -u noc.py
 
       - name: Set commit message with timestamp
         run: echo "COMMIT_MSG=Update NOC at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV

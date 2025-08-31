@@ -27,7 +27,7 @@ jobs:
 
       - name: Fetch Naptan
         run: |
-          python naptan.py
+          python -u naptan.py
 
       - name: Cleanup
         run: |

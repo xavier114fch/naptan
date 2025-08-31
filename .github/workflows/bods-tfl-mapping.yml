@@ -29,7 +29,7 @@ jobs:
         env:
           TFL_API_KEY: ${{ secrets.TFL_API_KEY }}
         run: |
-          python bods.py
+          python -u bods.py
 
       - name: Set commit message with timestamp
         run: echo "COMMIT_MSG=Mapping BODS lineRef with TfL route numbers at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
