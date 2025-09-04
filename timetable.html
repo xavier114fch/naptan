@@ -300,8 +300,8 @@
                             row.innerHTML += '<th>Indicator</th>';
                             row.innerHTML += '<th>Compass</th>';
                             row.innerHTML += '<th>Timing Status</th>';
-                            row.innerHTML += '<th>Distance</th>';
-                            row.innerHTML += '<th>Bound</th>';
+                            // row.innerHTML += '<th>Distance</th>';
+                            // row.innerHTML += '<th>Bound</th>';
                             // row.innerHTML += '<th>WaitTime</th>';
                             row.innerHTML += '<th>Runtime</th>';
                             row.innerHTML += `<th colspan=${schedule.departures.length}></th>`;
@@ -322,8 +322,8 @@
                               // var suburbColumn = document.createElement('td');
                               var indicatorColumn = document.createElement('td');
                               var compassColumn = document.createElement('td');
-                              var distanceColumn = document.createElement('td');
-                              var dirColumn = document.createElement('td');
+                              // var distanceColumn = document.createElement('td');
+                              // var dirColumn = document.createElement('td');
                               var timingColumn = document.createElement('td');
                               var runtimeColumn = document.createElement('td');
                               // var waitTimeColumn = document.createElement('td');
@@ -344,8 +344,8 @@
                               compassColumn.textContent = stopStore[stop].properties && stopStore[stop].properties.bearing ? stopStore[stop].properties.bearing : '';
 
                               timingColumn.textContent = timetable.timingStatuses[l];
-                              distanceColumn.textContent = route.distance[l];
-                              dirColumn.textContent = route.direction[l];
+                              // distanceColumn.textContent = route.distance[l];
+                              // dirColumn.textContent = route.direction[l];
 
                               runtimeColumn.innerHTML = '';
                               if (timetable.waitTimes[l] != '')
@@ -367,8 +367,8 @@
                               row.appendChild(indicatorColumn);
                               row.appendChild(compassColumn);
                               row.appendChild(timingColumn);
-                              row.appendChild(distanceColumn);
-                              row.appendChild(dirColumn);
+                              // row.appendChild(distanceColumn);
+                              // row.appendChild(dirColumn);
                               // row.appendChild(waitTimeColumn);
                               row.appendChild(runtimeColumn);
 
