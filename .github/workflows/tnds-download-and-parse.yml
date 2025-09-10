@@ -37,7 +37,8 @@ jobs:
 
       - name: Copy current TNDS data into working directory
         run: |
-          rsync -a gh-pages-data/data/tnds data/tnds
+          mkdir -p data/tnds
+          rsync -a --delete gh-pages-data/data/tnds data/tnds
 
       - name: Set up Python
         uses: actions/setup-python@v5
