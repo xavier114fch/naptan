@@ -21,12 +21,23 @@ jobs:
           remove-codeql: 'true'
           remove-docker-images: 'true'
 
-      - name: Checkout repository
+      - name: Checkout main branch
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 1
+
+      - name: Checkout current TNDS data
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-data
           sparse-checkout: |
             data/tnds
+
+      - name: Copy current TNDS data into working directory
+        run: |
+          rsync -a gh-pages-data/data/tnds data/tnds
 
       - name: Set up Python
         uses: actions/setup-python@v5
