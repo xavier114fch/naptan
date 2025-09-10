@@ -25,6 +25,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+          sparse-checkout: |
+            data/tnds/*
 
       - name: Set up Python
         uses: actions/setup-python@v5

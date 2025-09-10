@@ -208,17 +208,49 @@ def convertTnds(_data_dir):
 
 	print('=====')
 
+def collectPreviousSlugs(_data_dir) -> dict:
+	_all_slugs = {}
+
+	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))])
+	# NCSD XMLs are in one level deeper
+	_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
+
+	for _file in sorted(os.listdir(_dir)):
+		if _file.endswith('.json'):
+			with open(os.path.join(_dir, _file), 'r') as f:
+				_data = json.load(f)
+
+				for _slug, _values in _data.items():
+					_all_slugs.setdefault(_slug, []):
+
+					for _v in _values:
+						_all_slugs[_slug].append({
+							'filename': _v.get('filename'),
+							'mode': _v.get('mode'),
+							'region': _v.get('region'),
+							'name': _v.get('name'),
+							'description': _v.get('description'),
+							'operators': _v.get('operators'),
+							'lastModified': _v.get('lastModified'),
+							'publicUse': _v.get('publicUse'),
+							'startDate': _v.get('startDate'),
+							'endDate': _v.get('endDate'),
+						})
+
+	_len = len(_all_slugs)
+	print(f'Collected {_len} previous slugs.')
+	return _all_slugs
+
 def outputTnds(_data_dir):
 	_all_services = {}
 	_all_slugs = {}
+	_out_of_date_file_list = []
+
 	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))])
 
 	if os.path.exists(f'{_data_dir}/tnds_out_of_date.json'):
 		with open(os.path.join(_data_dir, 'tnds_out_of_date.json'), 'r') as f:
 			_out_of_date_file_list = json.load(f)
-
-	else:
-		_out_of_date_file_list = []
 
 	for _directory in _directories:
 		print(f'Creating route files in {_directory} ...')
@@ -979,61 +1011,34 @@ def outputTnds(_data_dir):
 		print(f'Created {_len} slugs.')
 
 def compareSlugs(_data_dir):
-	def openLocalSlugs() -> bool:
-		global _current_slugs
-		try:
-			with open(os.path.join(f'{_data_dir}','all_slugs.json'), 'r') as f:
-				_current_slugs = json.load(f)
+	_current_slugs = {}
+	_previous_slugs = collectPreviousSlugs(_data_dir)
+	_merged_slugs = {}
 
-		except BaseException:
-			print('Cannot open local TNDS all slug list.')
+	with open(os.path.join(f'{_data_dir}','all_slugs.json'), 'r') as f:
+		_current_slugs = json.load(f)
 
-		else:
-			return True
+	for _k, _v in _current_slugs.items():
+		_merged_slugs[_k] = _v
 
+	for _k, _v in _previous_slugs.items():
+		if _k not in _merged_slugs:
+			_new_v = []
 
-	def openRemoteSlugs() -> bool:
-		global _previous_slugs
-		try:
-			_response = retryRequest('https://github.com/xavier114fch/naptan/raw/gh-pages/data/tnds/all_slugs.json')
-			_previous_slugs = _response.json()
+			for _item in _v:
+				_start_date = _item.get('startDate', None)
+				_end_date = _item.get('endDate', None)
 
-		except BaseException:
-			print('Cannot open remote TNDS all slug list.')
+				if compareDates(_start_date, _end_date):
+					_new_v.append(_item)
 
-		else:
-			return True
-
-	try:
-		openLocalSlugs() and openRemoteSlugs()
-
-	except BaseException:
-		pass
-
-	else:
-		_merged_slugs = {}
-
-		for _k, _v in _current_slugs.items():
-			_merged_slugs[_k] = _v
-
-		for _k, _v in _previous_slugs.items():
-			if _k not in _merged_slugs:
-				_new_v = []
-
-				for _item in _v:
-					_start_date = _item.get('startDate', None)
-					_end_date = _item.get('endDate', None)
-
-					if compareDates(_start_date, _end_date):
-						_new_v.append(_item)
-
-				if _new_v:
-					_merged_slugs[_k] = _new_v
+			if _new_v:
+				_merged_slugs[_k] = _new_v
 
 	with open(os.path.join(_data_dir, 'all_slugs.json'), 'w') as f:
 		f.write(json.dumps(_merged_slugs, ensure_ascii = False, separators=(',', ':')))
 		_len = len(_merged_slugs)
-		print(f'Created {_len} slugs.')
+		print(f'Merged {_len} slugs.')
 
 def getStopPointsFromTnds(_data_dir):
 	# def openNptgLocalities() -> bool:
