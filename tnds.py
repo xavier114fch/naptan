@@ -998,7 +998,7 @@ def compareSlugs(_data_dir):
 			_response = retryRequest('https://github.com/xavier114fch/naptan/raw/gh-pages/data/tnds/all_slugs.json')
 			_previous_slugs = _response.json()
 
-	 	except BaseException:
+		except BaseException:
 			print('Cannot open remote TNDS all slug list.')
 
 		else:
