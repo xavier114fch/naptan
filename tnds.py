@@ -1017,7 +1017,7 @@ def compareSlugs(_data_dir):
 			_merged_slugs[_k] = _v
 
 		for _k, _v in _previous_slugs.items():
-			if _k is not in _merged_slugs:
+			if _k not in _merged_slugs:
 				_new_v = []
 
 				for _item in _v:
