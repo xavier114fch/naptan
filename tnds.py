@@ -978,6 +978,62 @@ def outputTnds(_data_dir):
 		_len = len(_all_slugs)
 		print(f'Created {_len} slugs.')
 
+def compareSlugs(_data_dir):
+	def openLocalSlugs() -> bool:
+		global _current_slugs
+		try:
+			with open(os.path.join(f'{_data_dir}','all_slugs.json'), 'r') as f:
+				_current_slugs = json.load(f)
+
+		except BaseException:
+			print('Cannot open local TNDS all slug list.')
+
+		else:
+			return True
+
+
+	def openRemoteSlugs() -> bool:
+		global _previous_slugs
+		try:
+			_response = retryRequest('https://github.com/xavier114fch/naptan/raw/gh-pages/data/tnds/all_slugs.json')
+			_previous_slugs = _response.json()
+
+	 	except BaseException:
+			print('Cannot open remote TNDS all slug list.')
+
+		else:
+			return True
+
+	try:
+		openLocalSlugs() and openRemoteSlugs()
+
+	except BaseException:
+		pass
+
+	else:
+		_merged_slugs = {}
+
+		for _k, _v in _current_slugs.items():
+			_merged_slugs[_k] = _v
+
+		for _k, _v in _previous_slugs.items():
+			if _k is not in _merged_slugs:
+				_new_v = []
+
+				for _item in _v:
+					_start_date = _item.get('startDate', None)
+					_end_date = _item.get('endDate', None)
+
+					if compareDates(_start_date, _end_date):
+						_new_v.append(_item)
+
+				if _new_v:
+					_merged_slugs[_k] = _new_v
+
+	with open(os.path.join(_data_dir, 'all_slugs.json'), 'w') as f:
+		f.write(json.dumps(_merged_slugs, ensure_ascii = False, separators=(',', ':')))
+		_len = len(_merged_slugs)
+		print(f'Created {_len} slugs.')
 
 def getStopPointsFromTnds(_data_dir):
 	# def openNptgLocalities() -> bool:
@@ -1223,7 +1279,6 @@ def compareStopPoints(_data_dir):
 		# print('Stops only in Naptan:')
 		# print(list(_stops_in_naptan.keys()))
 
-
 def generateTimetables(_data_dir):
 	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))])
 	_runtime_pattern = re.compile(r'-?PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?')
@@ -1388,6 +1443,7 @@ def main():
 	fetchTndsData(_data_dir)
 	convertTnds(_data_dir)
 	outputTnds(_data_dir)
+	compareSlugs(_data_dir)
 	getStopPointsFromTnds(_data_dir)
 	compareStopPoints(_data_dir)
 	# generateTimetables(_data_dir)
