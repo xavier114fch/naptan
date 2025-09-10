@@ -212,30 +212,34 @@ def collectPreviousSlugs(_data_dir) -> dict:
 	_all_slugs = {}
 
 	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))])
-	# NCSD XMLs are in one level deeper
-	_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
 
-	for _file in sorted(os.listdir(_dir)):
-		if _file.endswith('.json'):
-			with open(os.path.join(_dir, _file), 'r') as f:
-				_data = json.load(f)
+	for _directory in _directories:
+		print(f'Getting previous slugs in {_directory} ...')
 
-				for _slug, _values in _data.items():
-					_all_slugs.setdefault(_slug, [])
+		# NCSD XMLs are in one level deeper
+		_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
 
-					for _v in _values:
-						_all_slugs[_slug].append({
-							'filename': _v.get('filename'),
-							'mode': _v.get('mode'),
-							'region': _v.get('region'),
-							'name': _v.get('name'),
-							'description': _v.get('description'),
-							'operators': _v.get('operators'),
-							'lastModified': _v.get('lastModified'),
-							'publicUse': _v.get('publicUse'),
-							'startDate': _v.get('startDate'),
-							'endDate': _v.get('endDate'),
-						})
+		for _file in sorted(os.listdir(_dir)):
+			if _file.endswith('.json'):
+				with open(os.path.join(_dir, _file), 'r') as f:
+					_data = json.load(f)
+
+					for _slug, _values in _data.items():
+						_all_slugs.setdefault(_slug, [])
+
+						for _v in _values:
+							_all_slugs[_slug].append({
+								'filename': _v.get('filename'),
+								'mode': _v.get('mode'),
+								'region': _v.get('region'),
+								'name': _v.get('name'),
+								'description': _v.get('description'),
+								'operators': _v.get('operators'),
+								'lastModified': _v.get('lastModified'),
+								'publicUse': _v.get('publicUse'),
+								'startDate': _v.get('startDate'),
+								'endDate': _v.get('endDate'),
+							})
 
 	_len = len(_all_slugs)
 	print(f'Collected {_len} previous slugs.')
@@ -1041,42 +1045,8 @@ def compareSlugs(_data_dir):
 		print(f'Merged {_len} slugs.')
 
 def getStopPointsFromTnds(_data_dir):
-	# def openNptgLocalities() -> bool:
-	# 	global _locality_list
-	# 	try:
-	# 		_response = retryRequest('https://xavier114fch.github.io/naptan/data/nptg/nptg_localities.json')
-	# 		_locality_list = _response.json()
-	# 		# with open(os.path.join(f'{_nptg_dir}','nptg_localities.json'), 'r') as f:
-	# 		# 	_locality_list = json.load(f)
-
-	# 	except BaseException:
-	# 		print('Cannot open NPTG locality list.')
-
-	# 	else:
-	# 		return True
-
-	# def openNaptan() -> bool:
-	# 	global _naptan_list
-	# 	try:
-	# 		_response = retryRequest('https://xavier114fch.github.io/naptan/data/naptan/naptan_stop_points_all.json')
-	# 		_naptan_list = _response.json()
-	# 		# with open(os.path.join(f'{_naptan_dir}','naptan_stop_points_all.json'), 'r') as f:
-	# 		# 	_naptan_list = json.load(f)
-
-	# 	except BaseException:
-	# 		print('Cannot open Naptan list.')
-
-	# 	else:
-	# 		return True
-
-	# try:
-	# 	openNptgLocalities() and openNaptan()
-
-	# except BaseException:
-	# 	pass
-
-	# else:
 	_all_stops = {}
+
 	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item)) and _item != 'stopPoints'])
 
 	for _directory in _directories:
