@@ -221,7 +221,7 @@ def collectPreviousSlugs(_data_dir) -> dict:
 				_data = json.load(f)
 
 				for _slug, _values in _data.items():
-					_all_slugs.setdefault(_slug, []):
+					_all_slugs.setdefault(_slug, [])
 
 					for _v in _values:
 						_all_slugs[_slug].append({
