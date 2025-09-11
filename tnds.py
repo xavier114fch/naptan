@@ -211,7 +211,7 @@ def convertTnds(_data_dir):
 def collectPreviousSlugs(_data_dir) -> dict:
 	_all_slugs = {}
 
-	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))])
+	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item)) and _item != 'stopPoints'])
 
 	for _directory in _directories:
 		print(f'Getting previous slugs in {_directory} ...')
@@ -220,7 +220,7 @@ def collectPreviousSlugs(_data_dir) -> dict:
 		_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
 
 		for _file in sorted(os.listdir(_dir)):
-			if _file.endswith('.json'):
+			if not _file.startswith('_') and _file.endswith('.json'):
 				with open(os.path.join(_dir, _file), 'r') as f:
 					_data = json.load(f)
 
@@ -243,6 +243,7 @@ def collectPreviousSlugs(_data_dir) -> dict:
 
 	_len = len(_all_slugs)
 	print(f'Collected {_len} previous slugs.')
+	print('=====')
 	return _all_slugs
 
 def outputTnds(_data_dir):
@@ -1013,6 +1014,7 @@ def outputTnds(_data_dir):
 		f.write(json.dumps(_all_slugs, ensure_ascii = False, separators=(',', ':')))
 		_len = len(_all_slugs)
 		print(f'Created {_len} slugs.')
+	print('=====')
 
 def compareSlugs(_data_dir):
 	_current_slugs = {}
@@ -1195,6 +1197,9 @@ def getStopPointsFromTnds(_data_dir):
 
 	with open(os.path.join(f'{_data_dir}', f'all_stop_points.json'), 'w') as f:
 		f.write(json.dumps(list(_all_stops.keys()), ensure_ascii = False, separators=(',', ':')))
+		_len = len(_all_stops)
+		print(f'Created {_len} stops.')
+		print('=====')
 
 	print('Splitting StopPoints ...')
 	os.makedirs(f'{_data_dir}/stopPoints', exist_ok=True)
@@ -1204,6 +1209,8 @@ def getStopPointsFromTnds(_data_dir):
 
 		with open(os.path.join(f'{_data_dir}/stopPoints', f'{_k}.json'), 'w') as f:
 			f.write(json.dumps(_d, ensure_ascii = False, separators=(',', ':')))
+	
+	print('=====')
 
 def compareStopPoints(_data_dir):
 	def openTndsStopPoints() -> bool:
@@ -1247,6 +1254,7 @@ def compareStopPoints(_data_dir):
 		with open(os.path.join(_data_dir, 'stops_tnds_only.json'), 'w') as f:
 			f.write(json.dumps(_stops_in_tnds, ensure_ascii = False, separators=(',', ':')))
 			print(f'There are {len(_stops_in_tnds)} stop points only appear in TNDS')
+			print('=====')
 
 		# print('Stops only in TNDS:')
 		# print(list(_stops_in_tnds.keys()))
