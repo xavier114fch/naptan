@@ -229,7 +229,7 @@ def collectPreviousSlugs(_data_dir) -> dict:
 
 						for _v in _values:
 							_all_slugs[_slug].append({
-								'filename': _v.get('filename'),
+								'filename': _v.get('filename')[1:],
 								'mode': _v.get('mode'),
 								'region': _v.get('region'),
 								'name': _v.get('name'),
@@ -1041,6 +1041,8 @@ def compareSlugs(_data_dir):
 			if _new_v:
 				_merged_slugs[_k] = _new_v
 
+	_merged_slugs = dict(sorted(_merged_slugs.items()))
+	
 	with open(os.path.join(_data_dir, 'all_slugs.json'), 'w') as f:
 		f.write(json.dumps(_merged_slugs, ensure_ascii = False, separators=(',', ':')))
 		_len = len(_merged_slugs)
