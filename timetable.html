@@ -374,7 +374,7 @@
 
                               schedule.departures.forEach((departure, m) => {
                                 var departureColumn = document.createElement('td');
-                                var dayShift = (schedule.dayShift[m]) == 1 ? '*' : '';
+                                var dayShift = (schedule.dayShift[m] == 1) ? '*' : '';
                                 var waittime;
 
                                 if (l == 0) {
