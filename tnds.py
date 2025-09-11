@@ -1016,9 +1016,8 @@ def outputTnds(_data_dir):
 		print(f'Created {_len} slugs.')
 	print('=====')
 
-def compareSlugs(_data_dir):
+def mergeSlugs(_data_dir, _previous_slugs):
 	_current_slugs = {}
-	_previous_slugs = collectPreviousSlugs('gh-pages-data/data/tnds')
 	_merged_slugs = {}
 
 	with open(os.path.join(f'{_data_dir}','all_slugs.json'), 'r') as f:
@@ -1042,7 +1041,7 @@ def compareSlugs(_data_dir):
 				_merged_slugs[_k] = _new_v
 
 	_merged_slugs = dict(sorted(_merged_slugs.items()))
-	
+
 	with open(os.path.join(_data_dir, 'all_slugs.json'), 'w') as f:
 		f.write(json.dumps(_merged_slugs, ensure_ascii = False, separators=(',', ':')))
 		_len = len(_merged_slugs)
@@ -1213,6 +1212,67 @@ def getStopPointsFromTnds(_data_dir):
 			f.write(json.dumps(_d, ensure_ascii = False, separators=(',', ':')))
 	
 	print('=====')
+
+def mergeStopPoints(_data_dir, _previous_slugs):
+	_all_stops_from_previous = {}
+
+	for _slug, _services in _previous_slugs.items():
+		for _service in _services:
+			_routes = _service.get('routes', {})
+
+			for _route in _routes:
+				_stop_points = _route.get('stopPoints', [])
+				
+				for _stop in _stop_points:
+					if _stop not in _all_stops_from_previous:
+						_all_stops_from_previous.setdefault(_stop, {
+							'name': '',
+							'localityRef': '',
+							'slugs': [_slug]
+						})
+
+					else:
+						_slugs = _all_stops_from_previous.get(_stop, {}).get('slugs', [])
+						if _slug not in _slugs:
+							_slugs.append(_slug)
+
+	_previous_stops = list(_all_stops_from_previous.keys())
+	_current_stops = []
+
+	with open(os.path.join(f'{_data_dir}','all_stop_points.json'), 'r') as f:
+		_current_stops = json.load(f)
+
+	_common_stops = set(_previous_stops) & set(_current_stops)
+	_stops_only_in_previous = {_k: _v for _k, _v in all_stops_from_previous.items() if _k not in _common_stops}
+	_merged_stops = list(set(_previous_stops) | set(_current_stops))
+
+	for _stop in _common_stops:
+		_d = {}
+
+		with open(os.path.join(f'{_data_dir}/stopPoints', f'{_stop}.json'), 'r') as f:
+			_d = json.load(f)
+
+		_p_slugs = _all_stops_from_previous.get(_stop, {}).get('slugs', [])
+		_c_slugs = _d.get(_stop, {}).get('slugs', [])
+		_m_slugs = list(set(_p_slugs) | set(_c_slugs))
+
+		_d[_stop]['slugs'] = _m_slugs
+
+		with open(os.path.join(f'{_data_dir}/stopPoints', f'{_stop}.json'), 'w') as f:
+			f.write(json.dumps(_d, ensure_ascii = False, separators=(',', ':')))
+
+	for _k, _v in _stops_only_in_previous.items():
+		_d = {}
+		_d[_k] = _v
+
+		with open(os.path.join(f'{_data_dir}/stopPoints', f'{_k}.json'), 'w') as f:
+			f.write(json.dumps(_d, ensure_ascii = False, separators=(',', ':')))
+
+	with open(os.path.join(f'{_data_dir}', f'all_stop_points.json'), 'w') as f:
+		f.write(json.dumps(_merged_stops), ensure_ascii = False, separators=(',', ':'))
+		_len = len(_merged_stops)
+		print(f'Merged {_len} stops.')
+		print('=====')
 
 def compareStopPoints(_data_dir):
 	def openTndsStopPoints() -> bool:
@@ -1425,11 +1485,14 @@ def compareDates(_start, _end) -> bool:
 	return (_start and _today < _start) or (_start and _end and _start <= _today <= _end) or (_start and not _end and _today >= _start)
 
 def main():
+	_previous_slugs = collectPreviousSlugs('gh-pages-data/data/tnds')
+
 	fetchTndsData(_data_dir)
 	convertTnds(_data_dir)
 	outputTnds(_data_dir)
-	compareSlugs(_data_dir)
+	mergeSlugs(_data_dir, _previous_slugs)
 	getStopPointsFromTnds(_data_dir)
+	mergeStopPoints(_data_dir, _previous_slugs)
 	compareStopPoints(_data_dir)
 	# generateTimetables(_data_dir)
 
