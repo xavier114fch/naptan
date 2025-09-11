@@ -35,11 +35,6 @@ jobs:
           sparse-checkout: |
             data/tnds
 
-      - name: Copy current TNDS data into working directory
-        run: |
-          mkdir -p data/tnds
-          rsync -a --delete gh-pages-data/data/tnds data/tnds
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

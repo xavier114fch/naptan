@@ -114,7 +114,7 @@ def extract_zip(zip_file_path, extract_directory):
 		zip_ref.extractall(extract_path)
 
 def convertTnds(_data_dir):
-	_directories = [_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))]
+	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item)) and _item != 'stopPoints'])
 
 	if os.path.exists(f'{_data_dir}/tnds_out_of_date.json'):
 		with open(os.path.join(f'{_data_dir}', 'tnds_out_of_date.json'), 'r') as f:
@@ -1018,7 +1018,7 @@ def outputTnds(_data_dir):
 
 def compareSlugs(_data_dir):
 	_current_slugs = {}
-	_previous_slugs = collectPreviousSlugs(_data_dir)
+	_previous_slugs = collectPreviousSlugs('gh-pages-data/data/tnds')
 	_merged_slugs = {}
 
 	with open(os.path.join(f'{_data_dir}','all_slugs.json'), 'r') as f:
