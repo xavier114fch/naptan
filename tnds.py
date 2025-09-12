@@ -1269,7 +1269,7 @@ def mergeStopPoints(_data_dir, _previous_slugs):
 			f.write(json.dumps(_d, ensure_ascii = False, separators=(',', ':')))
 
 	with open(os.path.join(f'{_data_dir}', f'all_stop_points.json'), 'w') as f:
-		f.write(json.dumps(_merged_stops), ensure_ascii = False, separators=(',', ':'))
+		f.write(json.dumps(_merged_stops, ensure_ascii = False, separators=(',', ':')))
 		_len = len(_merged_stops)
 		print(f'Merged {_len} stops.')
 		print('=====')
