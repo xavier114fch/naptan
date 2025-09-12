@@ -1218,7 +1218,7 @@ def mergeStopPoints(_data_dir, _previous_slugs):
 
 	for _slug, _services in _previous_slugs.items():
 		for _service in _services:
-			_routes = _service.get('routes', {})
+			_routes = _service.get('routes', [])
 
 			for _route in _routes:
 				_stop_points = _route.get('stopPoints', [])
