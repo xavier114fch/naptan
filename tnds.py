@@ -1237,14 +1237,27 @@ def mergeStopPoints(_data_dir, _previous_slugs):
 							_slugs.append(_slug)
 
 	_previous_stops = list(_all_stops_from_previous.keys())
-	_current_stops = []
+	_len = len(_previous_stops)
+	print(f'Collected {_len} previous stops.')
 
+	_current_stops = []
 	with open(os.path.join(f'{_data_dir}','all_stop_points.json'), 'r') as f:
 		_current_stops = json.load(f)
 
-	_common_stops = set(_previous_stops) & set(_current_stops)
+	_len = len(_current_stops)
+	print(f'Collected {_len} current stops.')
+
+	_common_stops = list(set(_previous_stops) & set(_current_stops))
+	_len = len(_current_stops)
+	print(f'There are {_len} common stops.')
+
 	_stops_only_in_previous = {_k: _v for _k, _v in _all_stops_from_previous.items() if _k not in _common_stops}
+	_len = len(list(_stops_only_in_previous.keys()))
+	print(f'There are {_len} stops exist only in previous.')
+
 	_merged_stops = list(set(_previous_stops) | set(_current_stops))
+	_len = len(_merged_stops)
+	print(f'There are {_len} merged stops.')
 
 	for _stop in _common_stops:
 		_d = {}
@@ -1270,9 +1283,8 @@ def mergeStopPoints(_data_dir, _previous_slugs):
 
 	with open(os.path.join(f'{_data_dir}', f'all_stop_points.json'), 'w') as f:
 		f.write(json.dumps(_merged_stops, ensure_ascii = False, separators=(',', ':')))
-		_len = len(_merged_stops)
-		print(f'Merged {_len} stops.')
-		print('=====')
+
+	print('=====')
 
 def compareStopPoints(_data_dir):
 	def openTndsStopPoints() -> bool:
