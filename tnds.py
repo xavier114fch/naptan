@@ -1243,7 +1243,7 @@ def mergeStopPoints(_data_dir, _previous_slugs):
 		_current_stops = json.load(f)
 
 	_common_stops = set(_previous_stops) & set(_current_stops)
-	_stops_only_in_previous = {_k: _v for _k, _v in all_stops_from_previous.items() if _k not in _common_stops}
+	_stops_only_in_previous = {_k: _v for _k, _v in _all_stops_from_previous.items() if _k not in _common_stops}
 	_merged_stops = list(set(_previous_stops) | set(_current_stops))
 
 	for _stop in _common_stops:
