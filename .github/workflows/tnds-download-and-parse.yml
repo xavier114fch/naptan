@@ -27,14 +27,6 @@ jobs:
           ref: main
           fetch-depth: 1
 
-      - name: Checkout current TNDS data
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages-data
-          sparse-checkout: |
-            data/tnds
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -54,7 +46,6 @@ jobs:
 
       - name: Cleanup
         run: |
-          rm -rf gh-pages-data
           find data/tnds -maxdepth 1 -type f -name '*.zip' -delete
           find data/tnds -maxdepth 1 -type f -name 'servicereport.csv' -delete
           find data/tnds -maxdepth 1 -type f -name 'log.txt' -delete

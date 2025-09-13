@@ -94,7 +94,7 @@ def fetchTndsData(_data_dir):
 			if _file_name.endswith('.zip'):
 				print(f'Unzipping {_file_name} ...')
 				_zip_file_path = os.path.join(_data_dir, _file_name)
-				extract_zip(_zip_file_path, _data_dir)
+				extractZip(_zip_file_path, _data_dir)
 				# convertTnds(_data_dir, os.path.splitext(os.path.basename(_file_name))[0])
 
 		else:
@@ -107,7 +107,7 @@ def fetchTndsData(_data_dir):
 
 
 # Function to extract a ZIP file into a directory with the same name
-def extract_zip(zip_file_path, extract_directory):
+def extractZip(zip_file_path, extract_directory):
 	with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
 		zip_name = os.path.splitext(os.path.basename(zip_file_path))[0]
 		extract_path = os.path.join(extract_directory, zip_name)
@@ -116,95 +116,27 @@ def extract_zip(zip_file_path, extract_directory):
 def convertTnds(_data_dir):
 	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item)) and _item != 'stopPoints'])
 
-	if os.path.exists(f'{_data_dir}/tnds_out_of_date.json'):
-		with open(os.path.join(f'{_data_dir}', 'tnds_out_of_date.json'), 'r') as f:
-			_out_of_date_file_list = json.load(f)
-
-	else:
-		_out_of_date_file_list = []
-
 	for _directory in _directories:
 		print(f'Converting TNDS XML files in {_directory} ...')
 
 		# NCSD XMLs are in one level deeper
 		_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
 
-		_total_count, _out_of_date_count = 0, 0
+		_total_count = 0
 
 		for _file in sorted(os.listdir(_dir)):
 			if _file.endswith('.xml'):
 				# print(f'Converting TNDS XML file {_dir}/{_file} ...')
 				_total_count = _total_count + 1
 
-				if f'{_dir}/{_file}' in _out_of_date_file_list:
-					_out_of_date_count = _out_of_date_count + 1
-					continue
-
 				with open(os.path.join(_dir, _file), 'r') as f:
-					_content = f.read()
-					_root = ET.fromstring(_content)
-					_ns = {'txc': 'http://www.transxchange.org.uk/'}
-					_services = _root.findall('txc:Services/txc:Service', _ns)
-					_is_out_of_date = 0
+					_data = json.dumps(xmltodict.parse(_content), ensure_ascii=False, separators=(',', ':'))
+					_data = _data.replace('@', '')
 
-					# if len(_services) > 1:
-					# 	print(f'{_dir}/{_file} has {len(_services)} services.')
-
-					for _service in _services:
-						_operating_period = _service.find('txc:OperatingPeriod', _ns)
-
-						if _operating_period is not None:
-							_start_date = _operating_period.findtext('txc:StartDate', default='', namespaces=_ns).strip()
-							_end_date = _operating_period.findtext('txc:EndDate', default='', namespaces=_ns).strip()
-
-							if compareDates(_start_date, _end_date):
-								_data = json.dumps(xmltodict.parse(_content), ensure_ascii=False, separators=(',', ':'))
-								_data = _data.replace('@', '')
-
-								with open(os.path.join(_dir, f'_{os.path.splitext(_file)[0]}.json'), 'w') as f:
-									f.write(_data)
-
-								break
-
-							else:
-								# print(f'Service in {_dir}/{_file} is out of date: {_start_date} ~ {_end_date}.')
-								_is_out_of_date = _is_out_of_date + 1
-								continue
-
-						else:
-							continue
-
-					if _is_out_of_date == len(_services):
-						# print(f'All services in {_dir}/{_file} are out of date.')
-						_out_of_date_file_list.append(f'{_dir}/{_file}')
-						_out_of_date_count = _out_of_date_count + 1
-
-					# _operating_period = _root.find('txc:Services/txc:Service/txc:OperatingPeriod', _ns)
-
-					# if _operating_period is not None:
-					# 	_start_date = _operating_period.findtext('txc:StartDate', default='', namespaces=_ns).strip()
-					# 	_end_date = _operating_period.findtext('txc:EndDate', default='', namespaces=_ns).strip()
-
-					# 	if not compareDates(_start_date, _end_date):
-					# 		# print(f'{_dir}/{_file} is out of date: {_start_date} ~ {_end_date}.')
-					# 		_out_of_date_count = _out_of_date_count + 1
-					# 		continue
-
-					# 	_data = json.dumps(xmltodict.parse(_content), ensure_ascii=False, separators=(',', ':'))
-					# 	_data = _data.replace('@', '')
-
-					# 	with open(os.path.join(_dir, f'_{os.path.splitext(_file)[0]}.json'), 'w') as f:
-					# 		f.write(_data)
-
-					# else:
-					# 	# print(f'{_dir}/{_file} has no operating period.')
-					# 	_no_period_count = _no_period_count + 1
-
-			# print(f'Processed {_total_count} files. {_out_of_date_count} are out of date and {_no_period_count} have no operating period.')
+					with open(os.path.join(_dir, f'_{os.path.splitext(_file)[0]}.json'), 'w') as f:
+						f.write(_data)
+					
 		print(f'Processed {_total_count} files. {_out_of_date_count} out of date')
-
-	with open(os.path.join(_data_dir, 'tnds_out_of_date.json'), 'w') as f:
-		f.write(json.dumps(sorted(_out_of_date_file_list), ensure_ascii = False, separators=(',', ':')))
 
 	print('=====')
 
@@ -247,15 +179,9 @@ def collectPreviousSlugs(_data_dir) -> dict:
 	return _all_slugs
 
 def outputTnds(_data_dir):
-	_all_services = {}
 	_all_slugs = {}
-	_out_of_date_file_list = []
 
 	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))])
-
-	if os.path.exists(f'{_data_dir}/tnds_out_of_date.json'):
-		with open(os.path.join(_data_dir, 'tnds_out_of_date.json'), 'r') as f:
-			_out_of_date_file_list = json.load(f)
 
 	for _directory in _directories:
 		print(f'Creating route files in {_directory} ...')
@@ -264,7 +190,7 @@ def outputTnds(_data_dir):
 		_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
 
 		for _file in sorted(os.listdir(_dir)):
-			if _file.startswith('_') and _file.endswith('.json') and f'{_dir}/{os.path.splitext(_file)[0][1:]}.xml' not in _out_of_date_file_list:
+			if _file.startswith('_') and _file.endswith('.json'):
 				with open(os.path.join(_dir, _file), 'r') as f:
 					# print(f'{_directory}/{_file}')
 
@@ -826,56 +752,6 @@ def outputTnds(_data_dir):
 									'direction': _direction
 								})
 
-						
-
-						# else:
-							# _journey_pattern_list = _data.get('Services', {}).get('Service', {}).get('StandardService', {}).get('JourneyPattern', [])
-
-							# if not isinstance(_journey_pattern_list, list):
-							# 	_journey_pattern_list = [_journey_pattern_list]
-
-							# for _journey_pattern in _journey_pattern_list:
-							# 	_stop_points, _distance, _direction = [], [], []
-							# 	_journey_pattern_section_ref_list = _journey_pattern.get('JourneyPatternSectionRefs', [])
-
-							# 	if not isinstance(_journey_pattern_section_ref_list, list):
-							# 		_journey_pattern_section_ref_list = [_journey_pattern_section_ref_list]
-
-							# 	_journey_pattern_section_list = _data.get('JourneyPatternSections', {}).get('JourneyPatternSection', [])
-
-							# 	if not isinstance(_journey_pattern_section_list, list):
-							# 		_journey_pattern_section_list = [_journey_pattern_section_list]
-
-							# 	_links = []
-							# 	for _journey_pattern_section_ref in _journey_pattern_section_ref_list:
-							# 		for _journey_pattern_section in _journey_pattern_section_list:
-							# 			if _journey_pattern_section_ref == _journey_pattern_section.get('id', ''):
-							# 				_journey_pattern_timing_link = _journey_pattern_section.get('JourneyPatternTimingLink', [])
-
-							# 				if not isinstance(_journey_pattern_timing_link, list):
-							# 					_links.append(_journey_pattern_timing_link)
-
-							# 				else:
-							# 					_links.extend(_journey_pattern_timing_link)
-
-							# 	for _link in _links:
-							# 		_stop_points.append(_link.get('From', {}).get('StopPointRef', ''))
-							# 		_d = _link.get('Distance')
-							# 		_distance.append(int(_d) if _d is not None else None)
-							# 		_direction.append(_journey_pattern.get('Direction', ''))
-
-							# 	_link = _links[-1]
-							# 	_stop_points.append(_link.get('To', {}).get('StopPointRef', ''))
-
-							# 	_routes.append({
-							# 		'routeId': _journey_pattern.get('id', ''),
-							# 		# 'sectionRef': _route_section_ref,
-							# 		'description': _desc,
-							# 		'stopPoints' : _stop_points,
-							# 		'distance': _distance,
-							# 		'direction': _direction
-							# 	})
-
 						_serviced_org_list = _data.get('ServicedOrganisations', {}).get('ServicedOrganisation', [])
 
 						if not isinstance(_serviced_org_list, list):
@@ -945,70 +821,24 @@ def outputTnds(_data_dir):
 							'servicedOrganisations': _serviced_organisations
 						})
 
-						# if len(_single_service[_slug]) > 1:
-						# 	print(f'{_slug} has more than 1 entry.')
-
-						# with open(os.path.join(_dir, f'{_file[1:]}'), 'w') as f:
-						# 	f.write(json.dumps(_single_service, ensure_ascii = False, separators=(',', ':')))
-
-						_all_services.setdefault(_slug, [])
-						_all_services[_slug].append({
-							'filename': _file,
-							'mode': _mode,
-							'region': _directory,
-							'lineId': _line_ids,
-							'name': _line_names,
-							'origin': _origin,
-							'destination': _dest,
-							'vias': _vias,
-							'description': _desc,
-							'operators': _noc,
-							'lastModified': _last_modified,
-							'publicUse': _public_use,
-							'startDate': _start_date,
-							'endDate': _end_date,
-							'routes': _routes,
-							'timetables': dict(sorted(_journey_patterns.items())),
-							'vehicles': _vehicles,
-							'servicedOrganisations': _serviced_organisations
-						})
-
-						# if len(_all_services[_slug]) > 1:
-						# 	print(f'{_slug} has more than 1 entry.')
-
 						_all_slugs.setdefault(_slug, [])
 						_all_slugs[_slug].append({
 							'filename': _file[1:],
 							'mode': _mode,
 							'region': _directory,
-							# 'lineId': _line_ids,
 							'name': _line_names,
-							# 'origin': _origin,
-							# 'destination': _dest,
-							# 'vias': _vias,
 							'description': _desc,
 							'operators': _noc,
 							'lastModified': _last_modified,
 							'publicUse': _public_use,
 							'startDate': _start_date,
 							'endDate': _end_date,
-							# 'routes': _routes,
-							# 'timetables': _journey_patterns,
-							# 'vehicles': _vehicles,
-							# 'servicedOrganisations': _serviced_organisations
 						})
 
-						# if len(_all_slugs[_slug]) > 1:
-						# 	print(f'{_slug} has more than 1 entry.')
 
 					if _single_service is not {}:
 						with open(os.path.join(_dir, f'{_file[1:]}'), 'w') as f:
 							f.write(json.dumps(_single_service, ensure_ascii = False, separators=(',', ':')))
-
-	# with open(os.path.join(_data_dir, 'all_services.json'), 'w') as f:
-	# 	f.write(json.dumps(_all_services, ensure_ascii = False, separators=(',', ':')))
-	# 	_len = sum(len(v) for v in _all_services.values())
-	# 	print(f'Created {_len} services.')
 
 	with open(os.path.join(_data_dir, 'all_slugs.json'), 'w') as f:
 		f.write(json.dumps(_all_slugs, ensure_ascii = False, separators=(',', ':')))
@@ -1497,14 +1327,14 @@ def compareDates(_start, _end) -> bool:
 	return (_start and _today < _start) or (_start and _end and _start <= _today <= _end) or (_start and not _end and _today >= _start)
 
 def main():
-	_previous_slugs = collectPreviousSlugs('gh-pages-data/data/tnds')
+	# _previous_slugs = collectPreviousSlugs('gh-pages-data/data/tnds')
 
 	fetchTndsData(_data_dir)
 	convertTnds(_data_dir)
 	outputTnds(_data_dir)
-	mergeSlugs(_data_dir, _previous_slugs)
+	# mergeSlugs(_data_dir, _previous_slugs)
 	getStopPointsFromTnds(_data_dir)
-	mergeStopPoints(_data_dir, _previous_slugs)
+	# mergeStopPoints(_data_dir, _previous_slugs)
 	compareStopPoints(_data_dir)
 	# generateTimetables(_data_dir)
 
