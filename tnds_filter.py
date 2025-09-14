@@ -108,7 +108,7 @@ def getStopPoints(_data_dir):
 
 	_all_stops = list(set(_all_stops))
 
-	with open(os.path.join(_data_dir, 'all_stop_points'), 'w') as f:
+	with open(os.path.join(_data_dir, 'all_stop_points.json'), 'w') as f:
 		f.write(json.dumps(_all_stops, ensure_ascii = False, separators=(',', ':')))
 		_len = len(_all_stops)
 		print(f'Filtered {_len} stops.')
