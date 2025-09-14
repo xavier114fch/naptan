@@ -45,29 +45,29 @@ def getSlugs(_data_dir) -> dict:
 					_data = json.load(f)
 					_total_slugs = _total_slugs + len(list(_data.keys()))
 
-					for _slug, _values in _data.items():
+					for _slug, _services in _data.items():
 						_all_slugs.setdefault(_slug, [])
-						_total_services = len(_values)
+						_total_services = len(_services)
 						_not_expired = 0
 
-						for _v in _values:
-							_start_date = _v.get('startDate', None)
-							_end_date = _v.get('endDate', None)
+						for _service in _services:
+							_start_date = _service.get('startDate', None)
+							_end_date = _service.get('endDate', None)
 
 							if compareDates(_start_date, _end_date):
 								_not_expired = _not_expired + 1
 
 								_all_slugs[_slug].append({
-									'filename': _v.get('filename')[1:],
-									'mode': _v.get('mode'),
-									'region': _v.get('region'),
-									'name': _v.get('name'),
-									'description': _v.get('description'),
-									'operators': _v.get('operators'),
-									'lastModified': _v.get('lastModified'),
-									'publicUse': _v.get('publicUse'),
+									'filename': _service.get('filename')[1:],
+									'mode': _service.get('mode'),
+									'region': _service.get('region'),
+									'name': _service.get('name'),
+									'description': _service.get('description'),
+									'operators': _service.get('operators'),
+									'lastModified': _service.get('lastModified'),
+									'publicUse': _service.get('publicUse'),
 									'startDate': _start_date,
-									'endDate':_end_date,
+									'endDate': _end_date,
 								})
 
 						if _not_expired < _total_services:
