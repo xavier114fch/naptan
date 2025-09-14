@@ -49,7 +49,7 @@ jobs:
         run: |
           mkdir -p data/tnds
           rsync -a --delete gh-pages-data/data/tnds/ data/tnds/
-          python -u tnds-filter.py
+          python -u tnds_filter.py
 
       - name: Set commit message with timestamp
         run: echo "COMMIT_MSG=Filter TNDS at $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_ENV
