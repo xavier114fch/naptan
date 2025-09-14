@@ -1,4 +1,4 @@
-name: Filter valud TNDS data
+name: Filter valid TNDS data
 
 on:
   schedule:
