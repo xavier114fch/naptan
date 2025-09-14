@@ -31,6 +31,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: gh-pages
+          path: gh-pages-data
           sparse-checkout: |
             data/tnds
 
@@ -46,6 +47,8 @@ jobs:
 
       - name: Filter TNDS
         run: |
+          mkdir -p data/tnds
+          rsync -a --delete gh-pages-data/data/tnds/ data/tnds/
           python -u tnds-filter.py
 
       - name: Set commit message with timestamp
