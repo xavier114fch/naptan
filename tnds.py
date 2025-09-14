@@ -137,7 +137,7 @@ def convertTnds(_data_dir):
 					with open(os.path.join(_dir, f'_{os.path.splitext(_file)[0]}.json'), 'w') as f:
 						f.write(_data)
 					
-		print(f'Processed {_total_count} files. {_out_of_date_count} out of date')
+		print(f'Processed {_total_count} files.')
 
 	print('=====')
 
