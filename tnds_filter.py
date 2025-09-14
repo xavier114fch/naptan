@@ -27,20 +27,20 @@ def compareDates(_start, _end) -> bool:
 
 	return (_start and _today < _start) or (_start and _end and _start <= _today <= _end) or (_start and not _end and _today >= _start)
 
-def collectPreviousSlugs(_data_dir) -> dict:
+def getSlugs(_data_dir) -> dict:
 	_all_slugs = {}
 	_total_slugs = 0
 
 	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item)) and _item != 'stopPoints'])
 
 	for _directory in _directories:
-		print(f'Getting previous slugs in {_directory} ...')
+		print(f'Getting slugs in {_directory} ...')
 
 		# NCSD XMLs are in one level deeper
 		_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
 
 		for _file in sorted(os.listdir(_dir)):
-			if not _file.startswith('_') and _file.endswith('.json'):
+			if _file.endswith('.json'):
 				with open(os.path.join(_dir, _file), 'r') as f:
 					_data = json.load(f)
 					_total_slugs = _total_slugs + len(list(_data.keys()))
@@ -82,8 +82,42 @@ def collectPreviousSlugs(_data_dir) -> dict:
 		print(f'Filtered {_len} over {_total_slugs} slugs.')
 	print('=====')
 
+def getStops(_data_dir):
+	_all_stops = []
+
+	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item)) and _item != 'stopPoints'])
+
+	for _directory in _directories:
+		print(f'Getting stops in {_directory} ...')
+
+		# NCSD XMLs are in one level deeper
+		_dir = f'{_data_dir}/{_directory}/{_directory}_TXC' if _directory == 'NCSD' else f'{_data_dir}/{_directory}'
+
+		for _file in sorted(os.listdir(_dir)):
+			if _file.endswith('.json'):
+				with open(os.path.join(_dir, _file), 'r') as f:
+					_data = json.load(f)
+
+					for _slug, _services in _data.items():
+						for _service in _services:
+							_routes = _service.get('routes', {})
+
+							for _route in _routes:
+								_stop_points = _route.get('stopPoints', [])
+								_all_stops.extend(_stop_points)
+
+	_all_stops = set(_all_stops)
+
+	with open(os.path.join(_data_dir, 'all_stop_points'), 'w') as f:
+		f.write(json.dumps(_all_stops, ensure_ascii = False, separators=(',', ':')))
+		_len = len(_all_stops)
+		print(f'Filtered {_len} stops.')
+	print('=====')
+
+
 def main():
-	collectPreviousSlugs(_data_dir)
+	getSlugs(_data_dir)
+	getStops(_data_dir)
 
 if __name__ == "__main__":
 	main()

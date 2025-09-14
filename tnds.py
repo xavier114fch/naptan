@@ -180,7 +180,7 @@ def collectPreviousSlugs(_data_dir) -> dict:
 	return _all_slugs
 
 def outputTnds(_data_dir):
-	_all_slugs = {}
+	# _all_slugs = {}
 
 	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))])
 
@@ -822,29 +822,29 @@ def outputTnds(_data_dir):
 							'servicedOrganisations': _serviced_organisations
 						})
 
-						_all_slugs.setdefault(_slug, [])
-						_all_slugs[_slug].append({
-							'filename': _file[1:],
-							'mode': _mode,
-							'region': _directory,
-							'name': _line_names,
-							'description': _desc,
-							'operators': _noc,
-							'lastModified': _last_modified,
-							'publicUse': _public_use,
-							'startDate': _start_date,
-							'endDate': _end_date,
-						})
+						# _all_slugs.setdefault(_slug, [])
+						# _all_slugs[_slug].append({
+						# 	'filename': _file[1:],
+						# 	'mode': _mode,
+						# 	'region': _directory,
+						# 	'name': _line_names,
+						# 	'description': _desc,
+						# 	'operators': _noc,
+						# 	'lastModified': _last_modified,
+						# 	'publicUse': _public_use,
+						# 	'startDate': _start_date,
+						# 	'endDate': _end_date,
+						# })
 
 
 					if _single_service is not {}:
 						with open(os.path.join(_dir, f'{_file[1:]}'), 'w') as f:
 							f.write(json.dumps(_single_service, ensure_ascii = False, separators=(',', ':')))
 
-	with open(os.path.join(_data_dir, 'all_slugs.json'), 'w') as f:
-		f.write(json.dumps(_all_slugs, ensure_ascii = False, separators=(',', ':')))
-		_len = len(_all_slugs)
-		print(f'Created {_len} slugs.')
+	# with open(os.path.join(_data_dir, 'all_slugs.json'), 'w') as f:
+	# 	f.write(json.dumps(_all_slugs, ensure_ascii = False, separators=(',', ':')))
+	# 	_len = len(_all_slugs)
+	# 	print(f'Created {_len} slugs.')
 	print('=====')
 
 def mergeSlugs(_data_dir, _previous_slugs):
@@ -1027,11 +1027,11 @@ def getStopPointsFromTnds(_data_dir):
 		# 	_len = len(_all_stops)
 		# 	print(f'Created {_len} stops.')
 
-	with open(os.path.join(f'{_data_dir}', f'all_stop_points.json'), 'w') as f:
-		f.write(json.dumps(list(_all_stops.keys()), ensure_ascii = False, separators=(',', ':')))
-		_len = len(_all_stops)
-		print(f'Created {_len} stops.')
-		print('=====')
+	# with open(os.path.join(f'{_data_dir}', f'all_stop_points.json'), 'w') as f:
+	# 	f.write(json.dumps(list(_all_stops.keys()), ensure_ascii = False, separators=(',', ':')))
+	_len = len(_all_stops)
+	print(f'Created {_len} stops.')
+	print('=====')
 
 	print('Splitting StopPoints ...')
 	os.makedirs(f'{_data_dir}/stopPoints', exist_ok=True)
