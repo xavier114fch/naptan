@@ -106,7 +106,7 @@ def getStops(_data_dir):
 								_stop_points = _route.get('stopPoints', [])
 								_all_stops.extend(_stop_points)
 
-	_all_stops = set(_all_stops)
+	_all_stops = list(set(_all_stops))
 
 	with open(os.path.join(_data_dir, 'all_stop_points'), 'w') as f:
 		f.write(json.dumps(_all_stops, ensure_ascii = False, separators=(',', ':')))
