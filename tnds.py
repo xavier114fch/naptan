@@ -130,6 +130,7 @@ def convertTnds(_data_dir):
 				_total_count = _total_count + 1
 
 				with open(os.path.join(_dir, _file), 'r') as f:
+					_content = f.read()
 					_data = json.dumps(xmltodict.parse(_content), ensure_ascii=False, separators=(',', ':'))
 					_data = _data.replace('@', '')
 
