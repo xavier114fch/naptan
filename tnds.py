@@ -1336,7 +1336,7 @@ def main():
 	# mergeSlugs(_data_dir, _previous_slugs)
 	getStopPointsFromTnds(_data_dir)
 	# mergeStopPoints(_data_dir, _previous_slugs)
-	compareStopPoints(_data_dir)
+	# compareStopPoints(_data_dir)
 	# generateTimetables(_data_dir)
 
 if __name__ == "__main__":

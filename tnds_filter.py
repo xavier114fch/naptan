@@ -82,7 +82,7 @@ def getSlugs(_data_dir) -> dict:
 		print(f'Filtered {_len} over {_total_slugs} slugs.')
 	print('=====')
 
-def getStops(_data_dir):
+def getStopPoints(_data_dir):
 	_all_stops = []
 
 	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item)) and _item != 'stopPoints'])
@@ -114,10 +114,57 @@ def getStops(_data_dir):
 		print(f'Filtered {_len} stops.')
 	print('=====')
 
+def compareStopPoints(_data_dir):
+	def openTndsStopPoints() -> bool:
+		global _tnds_stop_list
+		try:
+			with open(os.path.join(f'{_data_dir}','all_stop_points.json'), 'r') as f:
+				_tnds_stop_list = json.load(f)
+
+		except BaseException:
+			print('Cannot open TNDS all stop point list.')
+
+		else:
+			return True
+
+	def openNaptan() -> bool:
+		global _naptan_list
+		try:
+			_response = retryRequest('https://github.com/xavier114fch/naptan/raw/gh-pages/data/naptan/naptan_stop_points_all.json')
+			_naptan_list = _response.json()
+
+		except BaseException:
+			print('Cannot open Naptan list.')
+
+		else:
+			return True
+
+	try:
+		openTndsStopPoints() and openNaptan()
+
+	except BaseException:
+		pass
+
+	else:
+		_common_naptan = set(_tnds_stop_list) & set(_naptan_list)
+
+		_stops_in_tnds = [_k for _k in _tnds_stop_list if _k not in _common_naptan]
+
+		with open(os.path.join(_data_dir, 'stops_tnds_only.json'), 'w') as f:
+			f.write(json.dumps(_stops_in_tnds, ensure_ascii = False, separators=(',', ':')))
+			print(f'There are {len(_stops_in_tnds)} stop points only appear in TNDS')
+			print('=====')
+
+		# print('Stops only in TNDS:')
+		# print(list(_stops_in_tnds.keys()))
+		# print('===')
+		# print('Stops only in Naptan:')
+		# print(list(_stops_in_naptan.keys()))
 
 def main():
 	getSlugs(_data_dir)
-	getStops(_data_dir)
+	getStopPoints(_data_dir)
+	compareStopPoints(_data_dir)
 
 if __name__ == "__main__":
 	main()
