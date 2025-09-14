@@ -2,6 +2,10 @@
 name: Deploy static content to Pages
 
 on:
+  workflow_run:
+    workflows: ["NOC Download and Parse Data", "NPTG Download and Parse Data", "Naptan Download and Parse Data", "Filter valid TNDS data"]
+    types:
+      - completed
   schedule:
     - cron: '0 0,6,12,18 * * *'
   # Runs on pushes targeting the default branch

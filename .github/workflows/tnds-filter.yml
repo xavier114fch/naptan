@@ -1,6 +1,10 @@
 name: Filter valid TNDS data
 
 on:
+  workflow_run:
+    workflows: ["TNDS Download and Parse Data"]
+    types:
+      - completed
   schedule:
     - cron: '30 10,22 * * *'
   workflow_dispatch:
