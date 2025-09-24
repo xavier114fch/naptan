@@ -496,7 +496,7 @@ def outputTnds(_data_dir):
 										_vehicle_journey_code = _vk.get('VehicleJourneyCode')
 										_journey_pattern_ref = _vk.get('JourneyPatternRef')
 										_departure_time = _vk.get('DepartureTime')
-										_departure_day_shift = _vk.get('DepartureDayShift', '0')
+										_departure_day_shift = int(_vk.get('DepartureDayShift', '0'))
 
 										if _vehicle_journey_ref == _vehicle_journey_code and _journey_pattern_ref == _jp_id and _departure_time:
 											for _departure in _departures:
