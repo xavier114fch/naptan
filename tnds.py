@@ -181,8 +181,6 @@ def collectPreviousSlugs(_data_dir) -> dict:
 
 def outputTnds(_data_dir):
 	# _all_slugs = {}
-	_debug_file = '_tfl_54-263-_-y05-60523.json'
-
 	_directories = sorted([_item for _item in os.listdir(_data_dir) if os.path.isdir(os.path.join(_data_dir, _item))])
 
 	for _directory in _directories:
@@ -499,8 +497,8 @@ def outputTnds(_data_dir):
 										_departure_time = _vk.get('DepartureTime')
 										_departure_day_shift = int(_vk.get('DepartureDayShift', '0'))
 
-										if _file == _debug_file and _departure_day_shift == 1:
-											print(_vehicle_journey_code, _journey_pattern_ref, _departure_time, _departure_day_shift)
+										if _departure_day_shift == 1:
+											print(_file, _vehicle_journey_code, _journey_pattern_ref, _departure_time, _departure_day_shift)
 
 										if _vehicle_journey_ref == _vehicle_journey_code and _journey_pattern_ref == _jp_id and _departure_time:
 											for _departure in _departures:
@@ -521,8 +519,8 @@ def outputTnds(_data_dir):
 								_departure_time = _vj.get('DepartureTime')
 								_departure_day_shift = int(_vj.get('DepartureDayShift', '0'))
 
-								if _file == _debug_file and _departure_day_shift == 1:
-									print(_journey_pattern_ref, _departure_time, _departure_day_shift)
+								if _departure_day_shift == 1:
+									print(_file, _journey_pattern_ref, _departure_time, _departure_day_shift)
 
 								if _journey_pattern_ref and _journey_pattern_ref == _jp_id and _departure_time:
 									for _departure in _departures:
