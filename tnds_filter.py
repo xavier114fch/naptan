@@ -81,6 +81,7 @@ def getSlugs(_data_dir) -> dict:
 		_duplicated = 0
 		_overlapped = 0
 		_total = len(_services)
+		_to_be_removed = []
 
 		for _i in range(1, _total):
 			_previous_service = _services[_i - 1]
@@ -94,12 +95,14 @@ def getSlugs(_data_dir) -> dict:
 			_current_last_modified = _current_service.get('lastModified', None)
 
 			if _previous_start_date == _current_start_date and _previous_end_date == _current_end_date and _previous_last_modified <= _current_last_modified:
-				_services.pop(_i - 1)
+				_to_be_removed.append(_i - 1)
 				_duplicated = _duplicated + 1
 
 			if _current_start_date < _previous_end_date:
-				_services.pop(_i - 1)
+				_to_be_removed.append(_i - 1)
 				_overlapped = _overlapped + 1
+
+		_services = [_service for _i, _service in enumerate(_services) if _i not in _to_be_removed]
 
 		if len(_services) <= 0:
 			_all_slugs.pop(_slug, None)
