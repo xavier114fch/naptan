@@ -53,6 +53,7 @@ def getSlugs(_data_dir) -> dict:
 						for _service in _services:
 							_start_date = _service.get('startDate', None)
 							_end_date = _service.get('endDate', None)
+							_last_modified = _service.get('lastModified', None)
 
 							if compareDates(_start_date, _end_date):
 								_not_expired = _not_expired + 1
@@ -75,6 +76,38 @@ def getSlugs(_data_dir) -> dict:
 
 						if _not_expired == 0:
 							_all_slugs.pop(_slug, None)
+
+	for _slug, _services in _all_slugs.items():
+		_duplicated = 0
+		_overlapped = 0
+		_total = len(_services)
+
+		for _i in range(1, _total):
+			_previous_service = _services[_i - 1]
+			_previous_start_date = _previous_service.get('startDate', None)
+			_previous_end_date = _previous_service.get('endDate', None)
+			_previous_last_modified = _previous_service.get('lastModified', None)
+
+			_current_service = _services[_i]
+			_current_start_date = _current_service.get('startDate', None)
+			_current_end_date = _current_service.get('endDate', None)
+			_current_last_modified = _current_service.get('lastModified', None)
+
+			if _previous_start_date == _current_start_date and _previous_end_date == _current_end_date and _previous_last_modified <= _current_last_modified:
+				_services.pop(_i - 1)
+				_duplicated = _duplicated + 1
+
+			if _current_start_date < _previous_end_date:
+				_services.pop(_i - 1)
+				_overlapped = _overlapped + 1
+
+		if len(_services) <= 0:
+			_all_slugs.pop(_slug, None)
+			print(f'{_slug} has removed {_duplicated} duplicated and {_overlapped} overlapped services with nothing left.')
+
+		else:
+			print(f'{_slug} has removed {_duplicated} duplicated and {_overlapped} overlapped services out of {_total}.')
+
 
 	with open(os.path.join(_data_dir, 'all_slugs.json'), 'w') as f:
 		f.write(json.dumps(_all_slugs, ensure_ascii = False, separators=(',', ':')))
