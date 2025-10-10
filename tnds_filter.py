@@ -108,7 +108,7 @@ def getSlugs(_data_dir) -> dict:
 			_all_slugs.pop(_slug, None)
 			print(f'{_slug} has removed {_duplicated} duplicated and {_overlapped} overlapped services with nothing left.')
 
-		else if _duplicated > 0 or _overlapped > 0:
+		elif _duplicated > 0 or _overlapped > 0:
 			print(f'{_slug} has removed {_duplicated} duplicated and {_overlapped} overlapped services out of {_total}.')
 
 
