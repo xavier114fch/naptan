@@ -71,7 +71,7 @@ def getSlugs(_data_dir) -> dict:
 									'endDate': _end_date,
 								})
 
-						if _not_expired < _total_services:
+						if _not_expired < _total_services and _not_expired > 0:
 							print(f'{_slug} has {_not_expired}/{_total_services} services still valid.')
 
 						if _not_expired == 0:
@@ -104,7 +104,7 @@ def getSlugs(_data_dir) -> dict:
 
 		_services = [_service for _i, _service in enumerate(_services) if _i not in _to_be_removed]
 
-		if len(_services) <= 0:
+		if len(_services) == 0:
 			_all_slugs.pop(_slug, None)
 			print(f'{_slug} has removed {_duplicated} duplicated and {_overlapped} overlapped services with nothing left.')
 
