@@ -98,7 +98,7 @@ def getSlugs(_data_dir) -> dict:
 				_to_be_removed.append(_i - 1)
 				_duplicated = _duplicated + 1
 
-			if _current_start_date < _previous_end_date:
+			elif _current_start_date < _previous_end_date:
 				_to_be_removed.append(_i - 1)
 				_overlapped = _overlapped + 1
 
