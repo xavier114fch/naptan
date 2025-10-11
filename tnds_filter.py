@@ -90,7 +90,7 @@ def getSlugs(_data_dir) -> dict:
 			_previous_end_date = _previous_service.get('endDate', None)
 			_previous_end_date = datetime.strptime(_previous_end_date, '%Y-%m-%d').date() if _previous_end_date and _previous_end_date is not None else None
 			_previous_last_modified = _previous_service.get('lastModified', None)
-			_previous_last_modified = datetime.strptime(_previous_last_modified, '%Y-%m-%d').date() if _previous_last_modified and _previous_last_modified is not None else None
+			_previous_last_modified = datetime.fromisoformat(_previous_last_modified).date() if _previous_last_modified and _previous_last_modified is not None else None
 
 			_current_service = _services[_i]
 			_current_start_date = _current_service.get('startDate', None)
@@ -98,7 +98,7 @@ def getSlugs(_data_dir) -> dict:
 			_current_end_date = _current_service.get('endDate', None)
 			_current_end_date = datetime.strptime(_current_end_date, '%Y-%m-%d').date() if _current_end_date and _current_end_date is not None else None
 			_current_last_modified = _current_service.get('lastModified', None)
-			_current_last_modified = datetime.strptime(_current_last_modified, '%Y-%m-%d').date() if _current_last_modified and _current_last_modified is not None else None
+			_current_last_modified = datetime.fromisoformat(_current_last_modified).date() if _current_last_modified and _current_last_modified is not None else None
 
 			if _previous_start_date == _current_start_date and _previous_end_date == _current_end_date and _previous_last_modified <= _current_last_modified:
 				_to_be_removed.append(_i - 1)
