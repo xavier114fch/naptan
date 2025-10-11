@@ -109,7 +109,7 @@ def getSlugs(_data_dir) -> dict:
 					_to_be_removed.append(_i - 1)
 					_overlapped = _overlapped + 1
 
-		_services = [_service for _i, _service in enumerate(_services) if _i not in _to_be_removed]
+		_all_slugs[_slug] = [_service for _i, _service in enumerate(_services) if _i not in _to_be_removed]
 
 		if len(_services) == 0:
 			_all_slugs.pop(_slug, None)
