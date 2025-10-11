@@ -109,7 +109,7 @@ def getSlugs(_data_dir) -> dict:
 					_to_be_removed.append(_i - 1)
 					_overlapped = _overlapped + 1
 
-		_all_slugs[_slug] = [_service for _i, _service in enumerate(_services) if _i not in _to_be_removed]
+		_services = [_service for _i, _service in enumerate(_services) if _i not in _to_be_removed]
 
 		if len(_services) == 0:
 			_all_slugs.pop(_slug, None)
@@ -118,6 +118,7 @@ def getSlugs(_data_dir) -> dict:
 		elif _duplicated > 0 or _overlapped > 0:
 			print(f'{_slug} has removed {_duplicated} duplicated and {_overlapped} overlapped services out of {_total}.')
 
+		_all_slugs[_slug] = _services
 
 	with open(os.path.join(_data_dir, 'all_slugs.json'), 'w') as f:
 		f.write(json.dumps(_all_slugs, ensure_ascii = False, separators=(',', ':')))
