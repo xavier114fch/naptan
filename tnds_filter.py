@@ -22,8 +22,8 @@ def retryRequest(url):
 
 def compareDates(_start, _end) -> bool:
 	_today = datetime.today().date()
-	_start = datetime.strptime(_start, '%Y-%m-%d').date() if _start and _start != '' else None
-	_end = datetime.strptime(_end, '%Y-%m-%d').date() if _end and _end != '' else None
+	_start = datetime.fromisoformat(_start).date() if _start and _start != '' else None
+	_end = datetime.fromisoformat(_end).date() if _end and _end != '' else None
 
 	return (_start and _today < _start) or (_start and _end and _start <= _today <= _end) or (_start and not _end and _today >= _start)
 
@@ -86,17 +86,17 @@ def getSlugs(_data_dir) -> dict:
 		for _i in range(1, _total):
 			_previous_service = _services[_i - 1]
 			_previous_start_date = _previous_service.get('startDate', None)
-			_previous_start_date = datetime.strptime(_previous_start_date, '%Y-%m-%d').date() if _previous_start_date and _previous_start_date is not None else None
+			_previous_start_date = datetime.fromisoformat(_previous_start_date).date() if _previous_start_date and _previous_start_date is not None else None
 			_previous_end_date = _previous_service.get('endDate', None)
-			_previous_end_date = datetime.strptime(_previous_end_date, '%Y-%m-%d').date() if _previous_end_date and _previous_end_date is not None else None
+			_previous_end_date = datetime.fromisoformat(_previous_end_date).date() if _previous_end_date and _previous_end_date is not None else None
 			_previous_last_modified = _previous_service.get('lastModified', None)
 			_previous_last_modified = datetime.fromisoformat(_previous_last_modified).date() if _previous_last_modified and _previous_last_modified is not None else None
 
 			_current_service = _services[_i]
 			_current_start_date = _current_service.get('startDate', None)
-			_current_start_date = datetime.strptime(_current_start_date, '%Y-%m-%d').date() if _current_start_date and _current_start_date is not None else None
+			_current_start_date = datetime.fromisoformat(_current_start_date).date() if _current_start_date and _current_start_date is not None else None
 			_current_end_date = _current_service.get('endDate', None)
-			_current_end_date = datetime.strptime(_current_end_date, '%Y-%m-%d').date() if _current_end_date and _current_end_date is not None else None
+			_current_end_date = datetime.fromisoformat(_current_end_date).date() if _current_end_date and _current_end_date is not None else None
 			_current_last_modified = _current_service.get('lastModified', None)
 			_current_last_modified = datetime.fromisoformat(_current_last_modified).date() if _current_last_modified and _current_last_modified is not None else None
 

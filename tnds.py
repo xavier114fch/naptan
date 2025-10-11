@@ -1327,8 +1327,8 @@ def compareDicts(_x, _y) -> bool:
 
 def compareDates(_start, _end) -> bool:
 	_today = datetime.today().date()
-	_start = datetime.strptime(_start, '%Y-%m-%d').date() if _start and _start != '' else None
-	_end = datetime.strptime(_end, '%Y-%m-%d').date() if _end and _end != '' else None
+	_start = datetime.fromisoformat(_start).date() if _start and _start != '' else None
+	_end = datetime.fromisoformat(_end).date() if _end and _end != '' else None
 
 	return (_start and _today < _start) or (_start and _end and _start <= _today <= _end) or (_start and not _end and _today >= _start)
 
