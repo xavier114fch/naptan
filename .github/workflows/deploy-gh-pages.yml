@@ -53,8 +53,21 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Print current space
-        run: df -h
+      - name: Move checkout
+        run: |
+          echo "Before Move"
+          echo "Volume of /"
+          df -h /
+          echo "Volume of /mnt"
+          df -h /mnt
+          echo "Creating /mnt/work and move checkout"
+          mkdir -p /mnt/work
+          rsync -a $GITHUB_WORKSPACE/ /mnt/work/
+          echo "Switch to /mnt/work"
+          cd /mnt/work
+          echo "PWD is $(pwd)"
+          echo "Current volume of all drives"
+          df -h
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -63,7 +76,8 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          path: '.'
+          # path: '.'
+          path: /mnt/work
 
       - name: Deploy to GitHub Pages
         id: deployment
