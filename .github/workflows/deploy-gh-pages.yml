@@ -29,7 +29,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            ref: gh-pages
+            fetch-depth: 1
+
+      - name: Upload artifact
+          uses: actions/upload-pages-artifact@v3
+          with:
+            # Upload entire repository
+            path: '.'
+
   deploy:
     environment:
       name: github-pages
@@ -47,25 +61,8 @@ jobs:
       #     remove-codeql: 'true'
       #     remove-docker-images: 'true'
 
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          fetch-depth: 1
-
       - name: Setup Pages
         uses: actions/configure-pages@v5
-
-      # - name: Upload artifact
-      #   uses: actions/upload-pages-artifact@v3
-      #   with:
-      #     # Upload entire repository
-      #     path: '.'
-
-      - name: Deploy to gh-pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: .
 
       - name: Deploy to GitHub Pages
         id: deployment
