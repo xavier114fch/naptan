@@ -57,7 +57,14 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Archive Artifact
-        run: tar -cf artifact.tar .
+        run: |
+          tar \
+            --dereference --hard-dereference \
+            -cf artifact.tar \
+            --exclude=.git \
+            --exclude=.github \
+            --exclude=".[^/]*" \
+            .
 
       - name: Upload Artifact
         id: upload-artifact
