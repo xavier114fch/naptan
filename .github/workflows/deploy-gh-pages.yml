@@ -53,6 +53,9 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
+      - name: Print current space
+        run: df -h
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
