@@ -59,7 +59,7 @@ jobs:
       - name: Archive Artifact
         run: |
           mkdir -p artifact
-          tar -cvf artifact/artifact.tar .
+          tar -cf artifact/artifact.tar .
 
       - name: Upload Artifact
         id: upload-artifact
