@@ -36,16 +36,16 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Maximise build space
-        uses: easimon/maximize-build-space@master
-        with:
-          root-reserve-mb: 512
-          swap-size-mb: 1024
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
+      # - name: Maximise build space
+      #   uses: easimon/maximize-build-space@master
+      #   with:
+      #     root-reserve-mb: 512
+      #     swap-size-mb: 1024
+      #     remove-dotnet: 'true'
+      #     remove-android: 'true'
+      #     remove-haskell: 'true'
+      #     remove-codeql: 'true'
+      #     remove-docker-images: 'true'
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,21 +53,8 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Move checkout
-        run: |
-          echo "Before Move"
-          echo "Volume of /"
-          df -h /
-          echo "Volume of /mnt"
-          df -h /mnt
-          echo "Creating /mnt/work and move checkout"
-          mkdir -p /mnt/work
-          rsync -a $GITHUB_WORKSPACE/ /mnt/work/
-          echo "Switch to /mnt/work"
-          cd /mnt/work
-          echo "PWD is $(pwd)"
-          echo "Current volume of all drives"
-          df -h
+      - name: Check current volume
+        run: df -h
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -76,8 +63,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
-          # path: '.'
-          path: /mnt/work
+          path: '.'
 
       - name: Deploy to GitHub Pages
         id: deployment
