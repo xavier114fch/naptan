@@ -58,9 +58,10 @@ jobs:
 
       - name: Archive Artifact
         run: |
+          mkdir -p artifact
           tar \
             --dereference --hard-dereference \
-            -cf artifact.tar \
+            -cf artifact/artifact.tar \
             --exclude=.git \
             --exclude=.github \
             --exclude=".[^/]*" \
@@ -71,7 +72,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: 'github-pages'
-          path: artifact.tar
+          path: artifact/artifact.tar
           retention-days: '1'
           if-no-files-found: error
 
