@@ -420,7 +420,7 @@ def outputTnds(_data_dir):
 											'note': _days_of_non_operation.get('Note', '')
 										})
 
-								_days_of_operation = (_vj.get('OperatingProfile') or {}).get('BankHolidayOperation', {}).get('DaysOfOperation', {}) or _service.get('OperatingProfile', {}).get('BankHolidayOperation', {}).get('DaysOfOperation', {})
+								_days_of_operation = ((_vj.get('OperatingProfile') or {}).get('BankHolidayOperation') or {}).get('DaysOfOperation', {}) or _service.get('OperatingProfile', {}).get('BankHolidayOperation', {}).get('DaysOfOperation', {})
 
 								if _days_of_operation:
 									_holidays = _operating_profile.setdefault('holidays', {})
@@ -442,7 +442,7 @@ def outputTnds(_data_dir):
 
 									_running.extend(_other_public_holidays)
 
-								_days_of_non_operation = (_vj.get('OperatingProfile') or {}).get('BankHolidayOperation', {}).get('DaysOfNonOperation', {}) or _service.get('OperatingProfile', {}).get('BankHolidayOperation', {}).get('DaysOfNonOperation', {})
+								_days_of_non_operation = ((_vj.get('OperatingProfile') or {}).get('BankHolidayOperation') or {}).get('DaysOfNonOperation', {}) or _service.get('OperatingProfile', {}).get('BankHolidayOperation', {}).get('DaysOfNonOperation', {})
 
 								if _days_of_non_operation:
 									_holidays = _operating_profile.setdefault('holidays', {})
