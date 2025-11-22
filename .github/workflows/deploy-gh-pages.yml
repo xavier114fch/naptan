@@ -53,6 +53,17 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
+      - name: Cleanup
+        run: |
+          find . -type f -exec sh -c '
+            for f do
+              stripped=$(tr -d " \t\n\r" < "$f")
+              if [ "$stripped" = "[]" ] || [ "$stripped" = "{}" ]; then
+                rm "$f"
+              fi
+            done
+          ' sh {} +
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
