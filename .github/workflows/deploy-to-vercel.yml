@@ -49,12 +49,6 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Install dependecies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
       - name: Deploy to Vercel
         run: |
           npm install -g vercel
