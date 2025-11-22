@@ -1,0 +1,64 @@
+name: Deploy static content to Vercel
+
+on:
+  workflow_run:
+    workflows: ["NOC Download and Parse Data", "NPTG Download and Parse Data", "Naptan Download and Parse Data", "Filter valid TNDS data"]
+    types:
+      - completed
+  schedule:
+    - cron: '0 0,6,12,18 * * *'
+  # Runs on pushes targeting the default branch
+  push:
+    branches:
+      - gh-pages
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Single deploy job since we're just deploying
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Maximise build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 1
+
+      - name: Install dependecies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Vercel
+        run: |
+          npm install -g vercel
+          vercel --prod --yes \
+            --token ${{ secrets.VERCEL_TOKEN }}
+            --project ${{ secrets.VERCEL_PROJECT_ID }}
+            --org ${{ secrets.VERCEL_ORG_ID }}
