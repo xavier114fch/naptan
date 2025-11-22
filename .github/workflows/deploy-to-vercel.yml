@@ -54,7 +54,16 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          
         run: |
+          # 1. Create a .vercelignore file to exclude hidden files that bloat the upload
+          echo ".git" > .vercelignore
+          echo ".github" >> .vercelignore
+
+          # 2. Create a vercel.json to force Static Mode
+          # "framework": null tells Vercel strictly NOT to build anything, just serve files.
+          echo '{ "framework": null, "buildCommand": null }' > vercel.json
+
+          # 3. Install and Deploy
           npm install -g vercel@latest
-          vercel deploy --prod --yes \
-            --token ${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prod --yes --token ${{ secrets.VERCEL_TOKEN }}
