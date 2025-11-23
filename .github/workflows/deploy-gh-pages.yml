@@ -61,7 +61,12 @@ jobs:
               s=$(tr -d " \t\n\r" < "$f")
 
               if [[ "$s" = "{}" ]]; then
-                echo "Removing $f"
+                echo "$f" >> removed-files.txt
+                rm "$f"
+              fi
+
+              if [[ "$s" = "[]" ]]; then
+                echo "$f" >> removed-files.txt
                 rm "$f"
               fi
             fi
