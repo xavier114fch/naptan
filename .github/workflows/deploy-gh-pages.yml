@@ -55,17 +55,15 @@ jobs:
 
       - name: Cleanup
         run: |
-          shopt -s globstar
-          for f in **/*; do
-            if [ -f "$f" ]; then
-              stripped=$(tr -d " \t\n\r" < "$f")
-
-              if [[ "$stripped" = "[]" ]] || [[ "$stripped" = "{}" ]]; then
-                echo "Removing $f"
+          find . type -f -exec sh -c '
+            for f do
+              s=$(tr -d " \t\n\r" < "$f")
+              if [ "$s" = "{}" ]; then
+                echo "Deleting $f"
                 rm "$f"
               fi
-            fi
-          done
+            done
+          ' sh {} +
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
