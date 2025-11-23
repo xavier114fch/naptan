@@ -84,7 +84,7 @@ jobs:
             for f do
               s=$(tr -d " \t\n\r" < "$f")
 
-              if [[ "$s" = "[]" ]] || [[ "$s" = "{""}" ]]; then
+              if [[ "$s" = "[""]" ]] || [[ "$s" = "{""}" ]]; then
                 echo "$f" >> "$OUTfile"
               fi
             done
