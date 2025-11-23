@@ -62,7 +62,7 @@ jobs:
                 rm "$f"
               fi
             done
-          ' sh {} +
+          ' sh '{}' +
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
