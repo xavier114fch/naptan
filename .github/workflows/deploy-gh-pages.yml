@@ -94,7 +94,7 @@ jobs:
             .
 
           echo "Tarball size: "
-          du -sh artifact/artifact.tar
+          du -sh artifact/artifact.tar.gz
 
       - name: Upload Artifact
         id: upload-artifact
