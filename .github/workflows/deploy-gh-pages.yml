@@ -60,7 +60,7 @@ jobs:
             if [ -f "$f" ]; then
               stripped=$(tr -d " \t\n\r" < "$f")
 
-              if [ "$stripped" = "[]" ] || [ "$stripped" = "{}" ]; then
+              if [[ "$stripped" = "[]" ]] || [[] "$stripped" = "{}" ]]; then
                 echo "Removing $f"
                 rm "$f"
               fi
