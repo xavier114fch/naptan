@@ -55,15 +55,17 @@ jobs:
 
       - name: Cleanup
         run: |
-          find . type -f -exec sh -c '
-            for f do
+          shopt -s globstar
+          for f in **/*; do
+            if [[ -f "$f" ]]; then
               s=$(tr -d " \t\n\r" < "$f")
-              if [ "$s" = "{}" ]; then
-                echo "Deleting $f"
+
+              if [[ "$s" = "{}" ]]; then
+                echo "Removing $f"
                 rm "$f"
               fi
-            done
-          ' sh {} +
+            fi
+          done
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
