@@ -58,7 +58,7 @@ jobs:
           find . -type f -name '*.json' -exec sh -c '
             for f do
               stripped=$(tr -d " \t\n\r" < "$f")
-              if [ "$stripped" = "[]" ] || [ "$stripped" = "{}" ]; then
+              if [ "$stripped" = "[]" ] || [ "$stripped" = "{""}" ]; then
                 rm "$f"
               fi
             done
