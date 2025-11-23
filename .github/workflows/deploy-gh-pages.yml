@@ -53,27 +53,11 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      # - name: Cleanup
-      #   run: |
-      #     shopt -s globstar
-      #     for f in **/*; do
-      #       if [[ -f "$f" ]]; then
-      #         s=$(tr -d " \t\n\r" < "$f")
-
-      #         if [[ "$s" = "{}" ]]; then
-      #           echo "$f" >> removed-files.txt
-      #           rm "$f"
-      #         fi
-
-      #         if [[ "$s" = "[]" ]]; then
-      #           echo "$f" >> removed-files.txt
-      #           rm "$f"
-      #         fi
-      #       fi
-      #     done
-
       - name: Cleanup
         run: |
+          echo "Data size before cleaning up stale content: "
+          du -sh data
+
           OUTPUT_FILE="$(pwd)/empty_files.txt"
           > "$OUTPUT_FILE"
 
@@ -108,6 +92,9 @@ jobs:
             --exclude=".[^/]*" \
             --exclude-from=empty_files.txt \
             .
+
+          echo "Tarball size: "
+          du -sh artifact/artifact.tar
 
       - name: Upload Artifact
         id: upload-artifact
