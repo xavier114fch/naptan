@@ -86,7 +86,7 @@ jobs:
           mkdir -p artifact
           tar \
             --dereference --hard-dereference \
-            -cf artifact/artifact.tar \
+            -czf artifact/artifact.tar.gz \
             --exclude=.git \
             --exclude=.github \
             --exclude=".[^/]*" \
@@ -101,7 +101,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: 'github-pages'
-          path: artifact/artifact.tar
+          path: artifact/
           retention-days: '1'
           if-no-files-found: error
 
