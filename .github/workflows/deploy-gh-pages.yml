@@ -87,7 +87,7 @@ jobs:
             for f do
               s=$(tr -d " \t\n\r" < "$f")
 
-              if [ "$s" = "$EMPTY_ARR" ] || [ "$s" = "$EMPTY_OBJ" ]; then
+              if [[ "$s" = "$EMPTY_ARR" ]] || [[ "$s" = "$EMPTY_OBJ" ]]; then
                 echo "$f" >> "$OUTfile"
               fi
             done
