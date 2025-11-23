@@ -77,21 +77,18 @@ jobs:
           OUTPUT_FILE="$(pwd)/empty_files.txt"
           > "$OUTPUT_FILE"
 
-          find . -type f -exec sh -c '
+          find . -type f -print0 | xargs -0 sh -c '
             OUTfile="$1"
             shift
-
-            EMPTY_ARR="[]"
-            EMPTY_OBJ="{}"
 
             for f do
               s=$(tr -d " \t\n\r" < "$f")
 
-              if [[ "$s" = "$EMPTY_ARR" ]] || [[ "$s" = "$EMPTY_OBJ" ]]; then
+              if [[ "$s" = "[]" ]] || [[ "$s" = "{}" ]]; then
                 echo "$f" >> "$OUTfile"
               fi
             done
-          ' sh "$OUTPUT_FILE" '{}' +
+          ' sh "$OUTPUT_FILE"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
