@@ -81,6 +81,7 @@ jobs:
           find . -name "*.gz" -print0 | tar \
             --null -T - \
             --dereference --hard-dereference \
+            --exclude=artifact \
             -czf artifact/artifact.tar.gz
 
           echo "Tarball size: "
