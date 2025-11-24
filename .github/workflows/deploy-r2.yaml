@@ -80,7 +80,7 @@ jobs:
         run: |
           set -euo pipefail
           cat <<EOF > ~/.config/rclone/rclone.conf
-          [r2:]
+          [r2]
           type = s3
           provider = Cloudflare
           access_key_id = ${R2_ACCESS_KEY_ID}
