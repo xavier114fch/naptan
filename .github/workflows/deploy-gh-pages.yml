@@ -58,7 +58,7 @@ jobs:
           echo "Data size before compressing: "
           du -sh data
 
-          find . -type f \( -name "*.json" -o -name "*.geojson" \) -print0 | xargs -0 -P ${nproc} sh -c '
+          find . -type f \( -name "*.json" -o -name "*.geojson" \) -print0 | xargs -0 -P $(nproc) sh -c '
             for f do
               s=$(tr -d " \t\n\r" < "$f")
 
