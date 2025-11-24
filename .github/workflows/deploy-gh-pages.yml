@@ -111,8 +111,12 @@ jobs:
             done
           ' sh "$OUTPUT_FILE"
 
+          echo "These files are removed: "
+          cat $OUTPUT_FILE
+
       - name: Archive Artifact
         run: |
+          OUTPUT_FILE="$(pwd)/empty_files.txt"
           mkdir -p artifact
           tar \
             --dereference --hard-dereference \
@@ -121,7 +125,7 @@ jobs:
             --exclude=.git \
             --exclude=.github \
             --exclude=".[^/]*" \
-            --exclude-from=empty_files.txt \
+            --exclude-from=$OUTPUT_FILE \
             .
 
           echo "Tarball size: "
