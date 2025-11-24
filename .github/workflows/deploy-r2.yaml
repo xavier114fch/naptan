@@ -1,0 +1,105 @@
+name: Deploy data to R2
+
+on:
+  workflow_run:
+    workflows: ["NOC Download and Parse Data", "NPTG Download and Parse Data", "Naptan Download and Parse Data", "Filter valid TNDS data"]
+    types:
+      - completed
+  schedule:
+    - cron: '0 0,6,12,18 * * *'
+
+push:
+  branches:
+    - gh-pages
+
+  workflow_dispatch:
+
+permissions:
+  content: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Maximise build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 1
+
+      - name: Remove empty files
+        run: |
+          set -euo pipefail
+          echo "Data size before cleaning up stale content: "
+          du -sh data
+
+          find . -type f \( -name "*.json" -o -name "*.geojson" \) -print0 | xargs -0 -P $(nproc) sh -c '
+            for f do
+              s=$(tr -d " \t\n\r" < "$f")
+
+              if [ "$s" = "[]" ]; then
+                rm "$f"
+              fi
+
+              if [ "$s" = "{}" ]; then
+                rm "$f"
+              fi
+            done
+          ' sh
+
+          echo "Data size after cleaning up stale content: "
+          du -sh data
+
+        - name: Install rclone
+          run: |
+            set -euo pipefail
+            sudo -v ; curl https://rclone.org/install.sh | sudo bash
+
+        - name: Configure rclone
+          env:
+            R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+            R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+            R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          run: |
+            set -euo pipefail
+            mkdir -p $HOME/.config/rclone
+            cat > $HOME/.config/rclone/rclone.conf <<EOF
+            r2:
+              type = s3
+              provider = Other
+              access_key_id = ${R2_ACCESS_KEY_ID}
+              secret_access_key = ${R2_SECRET_ACCESS_KEY}
+              endpoint = https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
+              acl = public-read
+            EOF
+            rclone --version
+
+        - name: Sync to R2
+          env:
+            R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          run: |
+            set -euo pipefail
+            DATA_DIR="./data"
+            if [ ! -d "DATA_DIR" ]; then
+              echo "Data directory $DATA_DIR does not exist. Nothing to upload."
+              exit 0
+            fi
+            echo "Syncing files from $SRC_DIR to r2:${R2_BUCKET}"
+            rclone sync "$DATA_DIR" r2:"${R2_BUCKET}" --progress --transfers 16
