@@ -67,39 +67,39 @@ jobs:
           echo "Data size after cleaning up stale content: "
           du -sh data
 
-        - name: Install rclone
-          run: |
-            set -euo pipefail
-            sudo -v ; curl https://rclone.org/install.sh | sudo bash
+      - name: Install rclone
+        run: |
+          set -euo pipefail
+          sudo -v ; curl https://rclone.org/install.sh | sudo bash
 
-        - name: Configure rclone
-          env:
-            R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-            R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-            R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          run: |
-            set -euo pipefail
-            mkdir -p $HOME/.config/rclone
-            cat > $HOME/.config/rclone/rclone.conf <<EOF
-            r2:
-              type = s3
-              provider = Other
-              access_key_id = ${R2_ACCESS_KEY_ID}
-              secret_access_key = ${R2_SECRET_ACCESS_KEY}
-              endpoint = https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
-              acl = public-read
-            EOF
-            rclone --version
+      - name: Configure rclone
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p $HOME/.config/rclone
+          cat > $HOME/.config/rclone/rclone.conf <<EOF
+          r2:
+            type = s3
+            provider = Other
+            access_key_id = ${R2_ACCESS_KEY_ID}
+            secret_access_key = ${R2_SECRET_ACCESS_KEY}
+            endpoint = https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
+            acl = public-read
+          EOF
+          rclone --version
 
-        - name: Sync to R2
-          env:
-            R2_BUCKET: ${{ secrets.R2_BUCKET }}
-          run: |
-            set -euo pipefail
-            DATA_DIR="./data"
-            if [ ! -d "DATA_DIR" ]; then
-              echo "Data directory $DATA_DIR does not exist. Nothing to upload."
-              exit 0
-            fi
-            echo "Syncing files from $SRC_DIR to r2:${R2_BUCKET}"
-            rclone sync "$DATA_DIR" r2:"${R2_BUCKET}" --progress --transfers 16
+      - name: Sync to R2
+        env:
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          DATA_DIR="./data"
+          if [ ! -d "DATA_DIR" ]; then
+            echo "Data directory $DATA_DIR does not exist. Nothing to upload."
+            exit 0
+          fi
+          echo "Syncing files from $SRC_DIR to r2:${R2_BUCKET}"
+          rclone sync "$DATA_DIR" r2:"${R2_BUCKET}" --progress --transfers 16
