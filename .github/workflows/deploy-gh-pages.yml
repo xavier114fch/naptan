@@ -87,6 +87,7 @@ jobs:
           tar \
             --dereference --hard-dereference \
             -czf artifact/artifact.tar.gz \
+            --exclude=/artifact \
             --exclude=.git \
             --exclude=.github \
             --exclude=".[^/]*" \
