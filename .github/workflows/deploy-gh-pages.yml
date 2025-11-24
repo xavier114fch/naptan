@@ -53,26 +53,25 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      # - name: Compress data and remove empty files
-      #   run: |
-      #     echo "Data size before compressing: "
-      #     du -sh data
+      - name: Remove empty files
+        run: |
+          set -euo pipefail
+          echo "Data size before cleaning up stale content: "
+          du -sh data
 
-      #     find . -type f \( -name "*.json" -o -name "*.geojson" \) -print0 | xargs -0 -P $(nproc) sh -c '
-      #       for f do
-      #         s=$(tr -d " \t\n\r" < "$f")
+          find . -type f \( -name "*.json" -o -name "*.geojson" \) -print0 | xargs -0 -P $(nproc) sh -c '
+            for f do
+              s=$(tr -d " \t\n\r" < "$f")
 
-      #         if [ "$s" = "[]" ]; then
-      #           rm "$f"
-      #         fi
+              if [ "$s" = "[]" ]; then
+                rm "$f"
+              fi
 
-      #         if [ "$s" = "{}" ]; then
-      #           rm "$f"
-      #         else
-      #           gzip -f "$f"
-      #         fi
-      #       done
-      #     ' sh
+              if [ "$s" = "{}" ]; then
+                rm "$f"
+              fi
+            done
+          ' sh
 
       # - name: Archive artifact
       #   run: |
@@ -86,34 +85,34 @@ jobs:
       #     echo "Tarball size: "
       #     ls -lh artifact/artifact.tar.gz
 
-      - name: Cleanup
-        run: |
-          set -euo pipefail
-          echo "Data size before cleaning up stale content: "
-          du -sh data
+      # - name: Cleanup
+      #   run: |
+      #     set -euo pipefail
+      #     echo "Data size before cleaning up stale content: "
+      #     du -sh data
 
-          OUTPUT_FILE="$(pwd)/empty_files.txt"
-          > "$OUTPUT_FILE"
+      #     OUTPUT_FILE="$(pwd)/empty_files.txt"
+      #     > "$OUTPUT_FILE"
 
-          find . -type f -print0 | xargs -0 -P $(nproc) sh -c '
-            OUTfile="$1"
-            shift
+      #     find . -type f -print0 | xargs -0 -P $(nproc) sh -c '
+      #       OUTfile="$1"
+      #       shift
 
-            for f do
-              s=$(tr -d " \t\n\r" < "$f")
+      #       for f do
+      #         s=$(tr -d " \t\n\r" < "$f")
 
-              if [ "$s" = "[]" ]; then
-                echo "$f" >> "$OUTfile"
-              fi
+      #         if [ "$s" = "[]" ]; then
+      #           echo "$f" >> "$OUTfile"
+      #         fi
 
-              if [ "$s" = "{}" ]; then
-                echo "$f" >> "$OUTfile"
-              fi
-            done
-          ' sh "$OUTPUT_FILE"
+      #         if [ "$s" = "{}" ]; then
+      #           echo "$f" >> "$OUTfile"
+      #         fi
+      #       done
+      #     ' sh "$OUTPUT_FILE"
 
-          echo "These files are removed: "
-          cat $OUTPUT_FILE
+      #     echo "These files are removed: "
+      #     cat $OUTPUT_FILE
 
       # - name: Archive Artifact
       #   run: |
@@ -135,12 +134,12 @@ jobs:
       - name: Prepare pages artifact
         run: |
           set -euo pipefail
-          OUTPUT_FILE="$(pwd)/empty_files.txt"
+          # OUTPUT_FILE="$(pwd)/empty_files.txt"
 
-          # Ensure empty file list exists (created by previous step)
-          if [ ! -f "$OUTPUT_FILE" ]; then
-            echo "No empty file list found; creating an empty list" > "$OUTPUT_FILE"
-          fi
+          # # Ensure empty file list exists (created by previous step)
+          # if [ ! -f "$OUTPUT_FILE" ]; then
+          #   echo "No empty file list found; creating an empty list" > "$OUTPUT_FILE"
+          # fi
 
           # Prepare artifact directory
           rm -rf artifact
@@ -153,21 +152,21 @@ jobs:
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.[^/]*' \
-            --exclude-from="$OUTPUT_FILE" \
+            # --exclude-from="$OUTPUT_FILE" \
             ./ artifact/
 
-          # The Cleanup step may have recorded absolute or ./ paths. Ensure listed files are removed from artifact/ if present.
-          if [ -s "$OUTPUT_FILE" ]; then
-            while IFS= read -r f; do
-              # normalize path by removing leading ./ if present
-              p="${f#./}"
-              # remove any leading slash
-              p="${p#/}"
-              if [ -n "$p" ] && [ -e "artifact/$p" ]; then
-                rm -f "artifact/$p" || true
-              fi
-            done < "$OUTPUT_FILE"
-          fi
+          # # The Cleanup step may have recorded absolute or ./ paths. Ensure listed files are removed from artifact/ if present.
+          # if [ -s "$OUTPUT_FILE" ]; then
+          #   while IFS= read -r f; do
+          #     # normalize path by removing leading ./ if present
+          #     p="${f#./}"
+          #     # remove any leading slash
+          #     p="${p#/}"
+          #     if [ -n "$p" ] && [ -e "artifact/$p" ]; then
+          #       rm -f "artifact/$p" || true
+          #     fi
+          #   done < "$OUTPUT_FILE"
+          # fi
 
           echo "Artifact size:"
           du -sh artifact || true
