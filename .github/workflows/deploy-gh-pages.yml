@@ -53,49 +53,82 @@ jobs:
           ref: gh-pages
           fetch-depth: 1
 
-      - name: Cleanup
+      - name: Compress data and remove empty files
         run: |
-          echo "Data size before cleaning up stale content: "
+          echo "Data size before compressing: "
           du -sh data
 
-          OUTPUT_FILE="$(pwd)/empty_files.txt"
-          > "$OUTPUT_FILE"
-
-          find . -type f -print0 | xargs -0 sh -c '
-            OUTfile="$1"
-            shift
-
+          find . -type f \( -name "*.json" -o -name "*.geojson" \) -print0 | xargs -0 -P ${nproc} sh -c '
             for f do
               s=$(tr -d " \t\n\r" < "$f")
 
               if [ "$s" = "[]" ]; then
-                echo "$f" >> "$OUTfile"
+                rm "$f"
               fi
 
               if [ "$s" = "{}" ]; then
-                echo "$f" >> "$OUTfile"
+                rm "$f"
+              else
+                gzip -f "$f"
               fi
             done
-          ' sh "$OUTPUT_FILE"
+          ' sh
+
+      - name: Archive artifact
+        run: |
+          mkdir -p artifact
+
+          find . -name "*.gz" -print0 | tar \
+            --null -T - \
+            --dereference --hard-dereference \
+            -czf artifact/artifact.tar.gz
+
+          echo "Tarball size: "
+          ls -lh artifact/artifact.tar.gz
+
+      # - name: Cleanup
+      #   run: |
+      #     echo "Data size before cleaning up stale content: "
+      #     du -sh data
+
+      #     OUTPUT_FILE="$(pwd)/empty_files.txt"
+      #     > "$OUTPUT_FILE"
+
+      #     find . -type f -print0 | xargs -0 sh -c '
+      #       OUTfile="$1"
+      #       shift
+
+      #       for f do
+      #         s=$(tr -d " \t\n\r" < "$f")
+
+      #         if [ "$s" = "[]" ]; then
+      #           echo "$f" >> "$OUTfile"
+      #         fi
+
+      #         if [ "$s" = "{}" ]; then
+      #           echo "$f" >> "$OUTfile"
+      #         fi
+      #       done
+      #     ' sh "$OUTPUT_FILE"
+
+      # - name: Archive Artifact
+      #   run: |
+      #     mkdir -p artifact
+      #     tar \
+      #       --dereference --hard-dereference \
+      #       -czf artifact/artifact.tar.gz \
+      #       --exclude=artifact \
+      #       --exclude=.git \
+      #       --exclude=.github \
+      #       --exclude=".[^/]*" \
+      #       --exclude-from=empty_files.txt \
+      #       .
+
+      #     echo "Tarball size: "
+      #     du -sh artifact/artifact.tar.gz
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
-
-      - name: Archive Artifact
-        run: |
-          mkdir -p artifact
-          tar \
-            --dereference --hard-dereference \
-            -czf artifact/artifact.tar.gz \
-            --exclude=artifact \
-            --exclude=.git \
-            --exclude=.github \
-            --exclude=".[^/]*" \
-            --exclude-from=empty_files.txt \
-            .
-
-          echo "Tarball size: "
-          du -sh artifact/artifact.tar.gz
 
       - name: Upload Artifact
         id: upload-artifact
