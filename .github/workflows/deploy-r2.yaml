@@ -79,7 +79,7 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          cat <<EOF > ~/.config/rclone/rclone.conf <<EOF
+          cat <<EOF > ~/.config/rclone/rclone.conf
           [r2:]
           type = s3
           provider = Cloudflare
