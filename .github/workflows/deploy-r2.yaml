@@ -97,9 +97,9 @@ jobs:
         run: |
           set -euo pipefail
           DATA_DIR="./data"
-          if [ ! -d "DATA_DIR" ]; then
+          if [ ! -d "$DATA_DIR" ]; then
             echo "Data directory $DATA_DIR does not exist. Nothing to upload."
             exit 0
           fi
-          echo "Syncing files from $SRC_DIR to r2:${R2_BUCKET}"
+          echo "Syncing files from $DATA_DIR to r2:${R2_BUCKET}"
           rclone sync "$DATA_DIR" r2:"${R2_BUCKET}" --progress --transfers 16
