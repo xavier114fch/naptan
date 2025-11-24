@@ -78,7 +78,7 @@ jobs:
         run: |
           mkdir -p artifact
 
-          find . -name "*.gz" -print0 | tar \
+          find . -name "*.gz" -not -path "./artifact/*" -print0 | tar \
             --null -T - \
             --dereference --hard-dereference \
             --exclude=artifact \
