@@ -43,7 +43,7 @@ jobs:
         with:
           ref: gh-pages
           fetch-depth: 1
-
+          
       - name: Remove empty files
         run: |
           set -euo pipefail
