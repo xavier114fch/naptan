@@ -79,17 +79,14 @@ jobs:
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
         run: |
           set -euo pipefail
-          mkdir -p $HOME/.config/rclone
-          cat > $HOME/.config/rclone/rclone.conf <<EOF
-          r2:
-            type = s3
-            provider = Other
-            access_key_id = ${R2_ACCESS_KEY_ID}
-            secret_access_key = ${R2_SECRET_ACCESS_KEY}
-            endpoint = https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
-            acl = public-read
+          cat <<EOF > ~/.config/rclone/rclone.conf <<EOF
+          [r2:]
+          type = s3
+          provider = Cloudflare
+          access_key_id = ${R2_ACCESS_KEY_ID}
+          secret_access_key = ${R2_SECRET_ACCESS_KEY}
+          endpoint = https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com
           EOF
-          rclone --version
 
       - name: Sync to R2
         env:
