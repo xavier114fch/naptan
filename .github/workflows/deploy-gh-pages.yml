@@ -152,7 +152,6 @@ jobs:
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.[^/]*' \
-            # --exclude-from="$OUTPUT_FILE" \
             ./ artifact/
 
           # # The Cleanup step may have recorded absolute or ./ paths. Ensure listed files are removed from artifact/ if present.
