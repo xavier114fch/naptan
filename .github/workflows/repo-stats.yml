@@ -1,0 +1,44 @@
+name: Repository Stats
+
+on:
+  workflow_dispatch:
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 1
+
+      - name: List directories with file counts and total size
+        run: |
+          echo "=== Directory Summary ==="
+          echo ""
+          # For each directory (including root)
+          # Print: total size + number of files + directory name
+          find . -type d | while read dir; do
+            count=$(find "$dir" -maxdepth 1 -type f | wc -l)
+            size=$(du -sh "$dir" | awk '{print $1}')
+            printf "%-50s Files: %-6s Size: %s\n" "$dir" "$count" "$size"
+          done
+
+      - name: Find top 10 largest files
+        run: |
+          echo ""
+          echo "=== Top 10 Largest Files ==="
+          echo ""
+          # Find all files, print size + path, sort descending, take top 10
+          find . -type f -printf "%s %p\n" | sort -nr | head -10 | awk '{ 
+            size=$1; 
+            path=$2; 
+            # Convert byte size to human readable
+            hum[1024**3]="GB"; hum[1024**2]="MB"; hum[1024]="KB";
+            for (x=1024**3; x>=1024; x/=1024) {
+              if (size>=x) { printf("%.2f %s  %s\n", size/x, hum[x], path); exit }
+            }
+            printf("%d B  %s\n", size, path);
+          }'
