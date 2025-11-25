@@ -1,5 +1,4 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+name: Create artifacts
 
 on:
   workflow_run:
@@ -73,6 +72,24 @@ jobs:
             done
           ' sh
 
+          echo "Data size after cleaning up stale content: "
+          du -sh data
+
+      - name: Archive Artifact
+        run: |
+          mkdir -p artifact
+          tar \
+            --dereference --hard-dereference \
+            -czf artifact/artifact.tar.gz \
+            --exclude=artifact \
+            --exclude=.git \
+            --exclude=.github \
+            --exclude=".[^/]*" \
+            .
+
+          echo "Tarball size: "
+          ls -lh artifact/artifact.tar.gz
+
       # - name: Archive artifact
       #   run: |
       #     mkdir -p artifact
@@ -131,70 +148,70 @@ jobs:
       #     echo "Tarball size: "
       #     ls -lh artifact/artifact.tar.gz
 
-      - name: Prepare pages artifact
-        run: |
-          set -euo pipefail
-          # OUTPUT_FILE="$(pwd)/empty_files.txt"
+      # - name: Prepare pages artifact
+      #   run: |
+      #     set -euo pipefail
+      #     # OUTPUT_FILE="$(pwd)/empty_files.txt"
 
-          # # Ensure empty file list exists (created by previous step)
-          # if [ ! -f "$OUTPUT_FILE" ]; then
-          #   echo "No empty file list found; creating an empty list" > "$OUTPUT_FILE"
-          # fi
+      #     # # Ensure empty file list exists (created by previous step)
+      #     # if [ ! -f "$OUTPUT_FILE" ]; then
+      #     #   echo "No empty file list found; creating an empty list" > "$OUTPUT_FILE"
+      #     # fi
 
-          # Prepare artifact directory
-          rm -rf artifact
-          mkdir -p artifact
+      #     # Prepare artifact directory
+      #     rm -rf artifact
+      #     mkdir -p artifact
 
-          # Copy repository contents into artifact/ while excluding git metadata, workflow files and leading dotfiles.
-          # rsync preserves file structure and is available on ubuntu-latest.
-          rsync -a \
-            --exclude='artifact' \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='.[^/]*' \
-            ./ artifact/
+      #     # Copy repository contents into artifact/ while excluding git metadata, workflow files and leading dotfiles.
+      #     # rsync preserves file structure and is available on ubuntu-latest.
+      #     rsync -a \
+      #       --exclude='artifact' \
+      #       --exclude='.git' \
+      #       --exclude='.github' \
+      #       --exclude='.[^/]*' \
+      #       ./ artifact/
 
-          # # The Cleanup step may have recorded absolute or ./ paths. Ensure listed files are removed from artifact/ if present.
-          # if [ -s "$OUTPUT_FILE" ]; then
-          #   while IFS= read -r f; do
-          #     # normalize path by removing leading ./ if present
-          #     p="${f#./}"
-          #     # remove any leading slash
-          #     p="${p#/}"
-          #     if [ -n "$p" ] && [ -e "artifact/$p" ]; then
-          #       rm -f "artifact/$p" || true
-          #     fi
-          #   done < "$OUTPUT_FILE"
-          # fi
+      #     # # The Cleanup step may have recorded absolute or ./ paths. Ensure listed files are removed from artifact/ if present.
+      #     # if [ -s "$OUTPUT_FILE" ]; then
+      #     #   while IFS= read -r f; do
+      #     #     # normalize path by removing leading ./ if present
+      #     #     p="${f#./}"
+      #     #     # remove any leading slash
+      #     #     p="${p#/}"
+      #     #     if [ -n "$p" ] && [ -e "artifact/$p" ]; then
+      #     #       rm -f "artifact/$p" || true
+      #     #     fi
+      #     #   done < "$OUTPUT_FILE"
+      #     # fi
 
-          echo "Artifact size:"
-          du -sh artifact || true
+      #     echo "Artifact size:"
+      #     du -sh artifact || true
 
-          # Fail early if artifact exceeds 1 GB to avoid Pages deployment hanging on large uploads.
-          bytes=$(du -sb artifact | cut -f1)
-          max=$((1000*1000*1000))
-          if [ "$bytes" -gt "$max" ]; then
-            echo "ERROR: pages artifact is too large: ${bytes} bytes (>1GB). Reduce size before deploying." >&2
-            exit 1
-          fi
+      #     # Fail early if artifact exceeds 1 GB to avoid Pages deployment hanging on large uploads.
+      #     bytes=$(du -sb artifact | cut -f1)
+      #     max=$((1000*1000*1000))
+      #     if [ "$bytes" -gt "$max" ]; then
+      #       echo "ERROR: pages artifact is too large: ${bytes} bytes (>1GB). Reduce size before deploying." >&2
+      #       exit 1
+      #     fi
 
-      # - name: Upload Artifact
-      #   id: upload-artifact
-      #   uses: actions/upload-artifact@v5
-      #   with:
-      #     name: 'github-pages'
-      #     path: artifact/
-      #     retention-days: '1'
-      #     if-no-files-found: error
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+      - name: Upload Artifact
+        id: upload-artifact
+        uses: actions/upload-artifact@v5
         with:
-          path: artifact
+          name: 'github-pages'
+          path: artifact/
+          retention-days: '1'
+          if-no-files-found: error
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      # - name: Upload Pages artifact
+      #   uses: actions/upload-pages-artifact@v4
+      #   with:
+      #     path: artifact
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # - name: Setup Pages
+      #   uses: actions/configure-pages@v5
+
+      # - name: Deploy to GitHub Pages
+      #   id: deployment
+      #   uses: actions/deploy-pages@v4
