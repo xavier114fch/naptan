@@ -23,10 +23,10 @@ jobs:
           ref: gh-pages
           path: uk-bus-open-data
       
-      - name: Copy TNDS stopPoints data only
+      - name: Copy Naptan data only
         run: |
           mkdir -p naptan
-          cp -r uk-bus-open-data/data/naptan naptan/
+          cp -r uk-bus-open-data/data/naptan/* naptan/
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v4
