@@ -1,0 +1,37 @@
+name: Deploy Naptan to GitHub Pages
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 * * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout gh-pages branch of uk-bus-open-data
+        uses: actions/checkout@v6
+        with:
+          repository: xavier114fch/uk-bus-open-data
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          ref: gh-pages
+          path: uk-bus-open-data
+      
+      - name: Copy TNDS stopPoints data only
+        run: |
+          mkdir -p naptan
+          cp -r uk-bus-open-data/data/tnds/naptan naptan/
+
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: naptan
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
