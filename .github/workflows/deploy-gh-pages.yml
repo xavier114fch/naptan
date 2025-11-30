@@ -26,7 +26,7 @@ jobs:
       - name: Copy TNDS stopPoints data only
         run: |
           mkdir -p naptan
-          cp -r uk-bus-open-data/data/tnds/naptan naptan/
+          cp -r uk-bus-open-data/data/naptan naptan/
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v4
