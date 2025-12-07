@@ -36,14 +36,14 @@ jobs:
       
       - name: Copy Naptan data only
         run: |
-          # mkdir -p naptan
-          # cp -r uk-bus-open-data/data/naptan/* naptan/
-          find uk-bus-open-data/data -mindepth 1 ! -path 'uk-bus-open-data/data/naptan*' -exec rm -rf {} +
+          mkdir -p naptan
+          cp -r uk-bus-open-data/data/naptan/* naptan/
+          rm -rf uk-bus-open-data
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v4
         with:
-          path: uk-bus-open-data/data/naptan
+          path: naptan
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
